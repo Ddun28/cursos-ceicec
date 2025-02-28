@@ -1,0 +1,9 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales y dependencias
+venv/
+.venv/
+flask/  # Solo si es un entorno virtual o carpeta a ignorar
