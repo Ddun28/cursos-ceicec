@@ -1,6 +1,6 @@
 # Proyecto Cursos CEICEC
 
-Este proyecto es una aplicación web desarro`enter code here`llada con  **Flask**  en el backend y  **Node.js**  en el frontend. Proporciona una plataforma para gestionar cursos y está diseñada para ser fácil de instalar y ejecutar.
+Este proyecto es una aplicación web desarrollado con  **Flask**  en el backend y  **Node.js**  en el frontend. Proporciona una plataforma para gestionar cursos y está diseñada para ser fácil de instalar y ejecutar.
 
 ----------
 
