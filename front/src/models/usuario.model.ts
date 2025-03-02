@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 
-const UsuarioSchema = z.object({
+export const UsuarioSchema = z.object({
   apellido: z.string().min(1, "El apellido es requerido"),
   cedula: z.number().min(1, "La cédula es requerida"),
   correo: z.string().email("El correo debe ser válido"),
