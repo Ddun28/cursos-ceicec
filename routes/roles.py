@@ -17,6 +17,20 @@ def agregar_rol():
         db.session.rollback()  # Revierte los cambios en la base de datos
         return jsonify({'error': str(e)}), 400 
     
+@main.route('/rol/<int:rol_id>', methods=['GET'])
+def obtener_rol(rol_id):
+    try:
+        # Buscar el rol por su ID
+        rol = Rol.query.get_or_404(rol_id)
+
+        # Devolver el nombre del rol
+        return jsonify({
+            'rol_id': rol.rol_id,
+            'rol_nombre': rol.rol_nombre,
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500  # Error interno del servidor
+    
 @main.route('/listado_roles', methods=['GET'])
 def lista_role():
     listado= Rol.query.all()

@@ -29,7 +29,7 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
       <div className="flex gap-2">
         <Button
           variant="ghost"
-          className="bg-green-900 hover:bg-green-900/90 rounded"
+          className="dark:bg-green-900 bg-green-600 hover:bg-green-900/90 rounded"
           size="icon"
           onClick={onEdit}
         >

@@ -1,26 +1,34 @@
 from ..modelo import db, cursousuario,cursosusuarios_schema,CursoUsuarioSchema,cursousuario_schema,usuario_schema
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Blueprint
 
 routa=Blueprint('cursousuario_blueprint',__name__)
 
+@routa.route('/ruta_protegida', methods=['GET'])
+@jwt_required()
+def ruta_protegida():
+    cedula = get_jwt_identity()
+    return jsonify({'cedula': cedula})
+
 @routa.route('/pago', methods=['POST'])
+@jwt_required()
 def pago_curso():
     try:
-        data = request.get_json()  # Obtén los datos JSON del request
-        pago_data = cursousuario_schema.load(data)  # Deserializa y valida los datos
-        
-        pago = cursousuario(**pago_data)  # Crea el nuevo usuario
+        cedula = get_jwt_identity()
+        data = request.get_json()
+        print("Data recibida:", data)
+        pago_data = CursoUsuarioSchema().load(data) # Corrección: pasa 'data' como argumento
+        pago = cursousuario(cedula=cedula, **pago_data)
         db.session.add(pago)
         db.session.commit()
-
-        # Serializa el nuevo usuario usando el esquema antes de enviarlo en la respuesta
-        result = cursousuario_schema.dump(pago)  # Serializa el objeto usuario
-        return jsonify(result), 201  # 201 Created y JSON serializado
-
+        result = CursoUsuarioSchema().dump(pago)
+        return jsonify(result), 201
     except Exception as e:
-        db.session.rollback()  # Revierte los cambios en la base de datos
-        return jsonify({'error': str(e)}), 400 
+        db.session.rollback()
+        print("Error en el backend:", str(e))
+        return jsonify({'error': str(e)}), 400
+    
     
 @routa.route('/lista_pago', methods=['GET'])
 def lista_pago():

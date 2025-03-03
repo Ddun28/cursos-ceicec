@@ -143,7 +143,7 @@ export const CursosTable = () => {
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Cursos</h1>
-        <Button className="bg-blue-800 hover:bg-blue-950 rounded" onClick={() => setIsCreateModalOpen(true)}>
+        <Button className="dark:bg-blue-800 bg-blue-400 hover:bg-blue-950 rounded" onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Crear Curso
         </Button>
       </div>
