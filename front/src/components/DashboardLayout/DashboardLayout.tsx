@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
-import { Separator } from '../ui/separator'
-import AppHeader from './components/AppHeader/AppHeader';
-import AppSidebar from './components/AppSidebar/AppSidebar';
+import { Navbar } from './components-test/Navbar';
+import { Sidebar } from './components-test/Sidebar';
 
 export interface IAppLayoutProps{
     children: ReactNode;
@@ -9,18 +8,16 @@ export interface IAppLayoutProps{
 
 export default function DashboardLayout({children} : IAppLayoutProps) {
   return (
-    <div className='w-full h-screen flex flex-row'>
-      <AppSidebar/>
-      <Separator className='bg-gray-400' orientation='vertical'/>
-      <div className='w-full h-full flex flex-col'>
-        <header className='h-16 w-full'>
-            <AppHeader/>
-        </header>
-        <Separator className='bg-gray-400'/>
-        <main className='w-full h-full p-4'>
-            {children}
-        </main>
-        </div> 
+    <div className="flex w-full dark:bg-slate-900 dark:text-white h-full">
+        <div className="hidden dark:bg-slate-900  xl:block w-80 h-full xl:fixed">
+            <Sidebar />
+        </div>
+        <div className="w-full xl:ml-80">
+            <Navbar />
+            <div className="p-6 bg-[#fafbfc] dark:bg-slate-900">
+                {children}
+            </div>
+        </div>
     </div>
   )
 }

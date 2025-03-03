@@ -19,9 +19,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Modalidad } from "@/models/modalidad.model";
 import { Usuario } from "@/models/usuario.model";
+
 
 interface CursoFormProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ export const CursoForm = ({ isOpen, onClose, onSubmit, initialData, instructors,
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-black">
+      <DialogContent className="bg-white dark:bg-black dark:text-white">
         <DialogHeader>
           <DialogTitle>{initialData ? "Editar Curso" : "Crear Curso"}</DialogTitle>
         </DialogHeader>
@@ -107,7 +108,7 @@ export const CursoForm = ({ isOpen, onClose, onSubmit, initialData, instructors,
                   <FormLabel>Instructor</FormLabel>
                   <FormControl>
                     <select
-                      className="bg-black border-gray-300 rounded"
+                      className="dark:bg-black bg-white w-full border p-2 dark:border-white border-black rounded"
                       {...field}
                       onChange={(e) => field.onChange(Number(e.target.value))} 
                     >
@@ -169,7 +170,7 @@ export const CursoForm = ({ isOpen, onClose, onSubmit, initialData, instructors,
                         type="checkbox"
                         checked={field.value} 
                         onChange={(e) => field.onChange(e.target.checked)} 
-                        className="h-4 w-4 text-blue-600 border-gray-300  rounded focus:ring-blue-500" 
+                        className="h-4 w-4 text-blue-600 border-gray-300 ml-6 rounded focus:ring-blue-500" 
                     />
                     </FormControl>
                     <FormMessage />
@@ -205,7 +206,7 @@ export const CursoForm = ({ isOpen, onClose, onSubmit, initialData, instructors,
                 <FormLabel>Modalidad</FormLabel>
                 <FormControl>
                   <select
-                    className="bg-black !border-gray-300 rounded"
+                    className="dark:bg-black p-2 bg-white border w-full border-black dark:border-white rounded"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   >
@@ -223,7 +224,7 @@ export const CursoForm = ({ isOpen, onClose, onSubmit, initialData, instructors,
           />
 
             <DialogFooter>
-              <Button type="submit" className="bg-blue-800 w-[50%] hover:bg-blue-950 rounded">
+              <Button type="submit" className="dark:bg-blue-800 w-[50%] bg-blue-400 hover:bg-blue-950 rounded">
                 {initialData ? "Guardar Cambios" : "Crear"}
               </Button>
             </DialogFooter>

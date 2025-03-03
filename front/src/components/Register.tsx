@@ -1,5 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Register() {
   const [cedula, setCedula] = useState("");
@@ -8,7 +15,6 @@ function Register() {
   const [apellido, setApellido] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
-  const [rol_id, setRol_id] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [cedulaError, setCedulaError] = useState("");
@@ -55,15 +61,16 @@ function Register() {
       !nombre ||
       !apellido ||
       !correo ||
-      !rol_id ||
       !usuario_telegram
     ) {
       setError("Todos los campos son requeridos");
+      toast.error("Todos los campos son requeridos");
       return;
     }
 
     if (cedulaError || contrasenaError) {
       setError(cedulaError || contrasenaError);
+      toast.error(cedulaError || contrasenaError);
       return;
     }
 
@@ -80,7 +87,7 @@ function Register() {
           cedula,
           usuario_telegram,
           contrasena,
-          rol_id,
+          rol_id: 1, 
         }),
       });
 
@@ -89,103 +96,174 @@ function Register() {
       if (!res.ok) {
         if (res.status === 400) {
           setError(data.error || "Error en los datos de registro");
+          toast.error(data.error || "Error en los datos de registro");
         } else if (res.status === 401) {
           setError(data.error || "Credenciales inválidas");
+          toast.error(data.error || "Credenciales inválidas");
         } else {
           setError(data.error || `HTTP error! status: ${res.status}`);
+          toast.error(data.error || `HTTP error! status: ${res.status}`);
         }
         return;
       }
 
-      console.log(data);
       setSuccessMessage("Registro exitoso!");
-      // Puedes redirigir o actualizar la UI aquí si es necesario
+      toast.success("Usuario registrado correctamente");
+      setCedula("");
+      setUsuario_telegram("");
+      setNombre("");
+      setApellido("");
+      setCorreo("");
+      setContrasena("");
+      setCedulaError("");
+      setContrasenaError("");
+
     } catch (error: any) {
       setError(error.message);
+      toast.error(error.message);
       console.error("Error:", error.message);
     }
   };
 
   return (
-    <div className="registro">
-      <h3 className="tituloregistro">Registrarse en Cursos CECCEIC</h3>
-      <form onSubmit={handleSubmit} method="post">
-        <div>
-          <ul>
-            <input
-              className="inputs_register"
-              type="text"
-              onChange={(e) => setNombre(e.target.value)}
-              value={nombre}
-              placeholder="Nombre"
-            />
-            <br></br>
-            <input
-              className="inputs_register"
-              type="text"
-              onChange={(e) => setApellido(e.target.value)}
-              value={apellido}
-              placeholder="Apellido"
-            />
-            <br />
-            <input
-              className="inputs_register"
-              type="text"
-              onChange={(e) => setCorreo(e.target.value)}
-              value={correo}
-              placeholder="Correo"
-            />
-            <br></br>
-            <input
-              className="inputs_register"
-              type="text"
-              onChange={handleCedulaChange}
-              value={cedula}
-              placeholder="Cédula"
-            />
-            {cedulaError && <p style={{ color: "red" }}>{cedulaError}</p>}{" "}
-            <br />
-            <input
-              className="inputs_register"
-              type="text"
-              onChange={(e) => setUsuario_telegram(e.target.value)}
-              value={usuario_telegram}
-              placeholder="Usuario telegram"
-            />
-            <br></br>
-            <input
-              className="inputs_register"
-              type="password"
-              onChange={handleContrasenaChange}
-              value={contrasena}
-              placeholder="Contraseña"
-            />
-            <br />
-            {contrasenaError && (
-              <p style={{ color: "red" }}>{contrasenaError}</p>
-            )}{" "}
-            <select value={rol_id} onChange={(e) => setRol_id(e.target.value)}>
-              <option value="">Selecciona un rol</option>
-              <option value="1">Administrador</option>
-              <option value="2">Instructor</option>
-              <option value="3">Estudiante</option>
-              <option value="4">S/R</option>
-            </select>
-            <br />
-            <br />
-            <Link className="button" to="/">
-              Iniciar
-            </Link>
-            <button className="button1" type="submit">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+            Registrarse en Cursos CECCEIC
+          </CardTitle>
+          <CardDescription className="text-center text-gray-600 dark:text-slate-400">
+            Completa el formulario para crear una cuenta de estudiante.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="nombre" className="text-gray-700 dark:text-white">
+                Nombre
+              </Label>
+              <Input
+                id="nombre"
+                type="text"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                placeholder="Nombre"
+                required
+                className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="apellido" className="text-gray-700 dark:text-white">
+                Apellido
+              </Label>
+              <Input
+                id="apellido"
+                type="text"
+                value={apellido}
+                onChange={(e) => setApellido(e.target.value)}
+                placeholder="Apellido"
+                required
+                className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="correo" className="text-gray-700 dark:text-white">
+                Correo
+              </Label>
+              <Input
+                id="correo"
+                type="email"
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
+                placeholder="Correo"
+                required
+                className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cedula" className="text-gray-700 dark:text-white">
+                Cédula
+              </Label>
+              <Input
+                id="cedula"
+                type="text"
+                value={cedula}
+                onChange={handleCedulaChange}
+                placeholder="Cédula"
+                required
+                className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400"
+              />
+              {cedulaError && (
+                <Alert variant="destructive" className="mt-2">
+                  <AlertDescription>{cedulaError}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="usuario_telegram" className="text-gray-700 dark:text-white">
+                Usuario de Telegram
+              </Label>
+              <Input
+                id="usuario_telegram"
+                type="text"
+                value={usuario_telegram}
+                onChange={(e) => setUsuario_telegram(e.target.value)}
+                placeholder="Usuario de Telegram"
+                required
+                className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contrasena" className="text-gray-700 dark:text-white">
+                Contraseña
+              </Label>
+              <Input
+                id="contrasena"
+                type="password"
+                value={contrasena}
+                onChange={handleContrasenaChange}
+                placeholder="Contraseña"
+                required
+                className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400"
+              />
+              {contrasenaError && (
+                <Alert variant="destructive" className="mt-2">
+                  <AlertDescription>{contrasenaError}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">
               Registrarme
-            </button>
-          </ul>
-        </div>
-      </form>
-      <div className="error">
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-      </div>
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-gray-600 dark:text-slate-400">
+            ¿Ya tienes una cuenta?{" "}
+            <Link to="/" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+              Iniciar sesión
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }

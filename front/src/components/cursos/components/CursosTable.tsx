@@ -9,7 +9,7 @@ import { DataTable } from "./DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from 'react-toastify';
 import { getModalities } from "@/api/modalidad/modalidad.api";
-import { getUsers } from "@/api/usuario/usuario.api";
+import { getUsers, getUsersByRole } from "@/api/usuario/usuario.api"; 
 import { Modalidad } from "@/models/modalidad.model";
 import { Usuario } from "@/models/usuario.model";
 
@@ -21,11 +21,14 @@ export const CursosTable = () => {
   const [currentCourse, setCurrentCourse] = useState<CursoPost | null>(null);
   const [instructors, setInstructors] = useState<Usuario[]>([]);
   const [modalities, setModalities] = useState<Modalidad[]>([]);  
+  const [filteredInstructors, setFilteredInstructors] = useState<Usuario[]>([]); // Estado para los instructores filtrados
+  const [selectedRole, setSelectedRole] = useState<string>('docente'); // Estado para el rol seleccionado, predeterminado a "docente"
 
   useEffect(() => {
     fetchCourses();
-    fetchInstructorsAndModalities()
-  }, []);
+    fetchInstructorsAndModalities();
+    fetchInstructorsByRole(selectedRole); // Llama a la función para obtener instructores por rol al cargar el componente
+  }, []); // Solo se ejecuta una vez al montar el componente
 
   const fetchInstructorsAndModalities = async () => {
     try {
@@ -40,12 +43,20 @@ export const CursosTable = () => {
     }
   };
 
+  const fetchInstructorsByRole = async (role: string) => {
+    try {
+      const instructorsData = await getUsersByRole(role);
+      setFilteredInstructors(instructorsData); // Actualiza el estado con los instructores filtrados
+    } catch (error) {
+      console.error("Error al obtener instructores por rol:", error);
+    }
+  };
+
   const fetchCourses = async () => {
     setLoading(true);
     try {
       const data = await getCourses();
       setCourses(data);
-
     } catch (error) {
       console.error("Error al obtener los cursos:", error);
     } finally {
@@ -74,7 +85,6 @@ export const CursosTable = () => {
     } catch (error) {
       console.error("Error al editar el curso:", error);
       toast.error("Error al editar el curso");
-
     }
   };
 
@@ -85,7 +95,7 @@ export const CursosTable = () => {
       toast.success("Curso eliminado correctamente");
     } catch (error) {
       console.error("Error al eliminar el curso:", error);
-      toast.success("Error al eliminar un curso");
+      toast.error("Error al eliminar un curso");
     }
   };
 
@@ -142,8 +152,8 @@ export const CursosTable = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Cursos</h1>
-        <Button className="bg-blue-800 hover:bg-blue-950 rounded" onClick={() => setIsCreateModalOpen(true)}>
+        <h1 className="text-2xl font-bold">Listado de Cursos</h1>
+        <Button className="dark:bg-blue-800 bg-blue-600 text-white hover:bg-blue-950 rounded" onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Crear Curso
         </Button>
       </div>
@@ -154,7 +164,7 @@ export const CursosTable = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreate}
-        instructors={instructors} 
+        instructors={filteredInstructors} // Usa los instructores filtrados
         modalities={modalities} 
       />
 
@@ -164,7 +174,7 @@ export const CursosTable = () => {
           onClose={() => setIsEditModalOpen(false)}
           onSubmit={handleEdit}
           initialData={currentCourse}
-          instructors={instructors} 
+          instructors={filteredInstructors} // Usa los instructores filtrados
           modalities={modalities} 
         />
       )}

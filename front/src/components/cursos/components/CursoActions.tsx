@@ -29,7 +29,7 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
       <div className="flex gap-2">
         <Button
           variant="ghost"
-          className="bg-green-900 hover:bg-green-900/90 rounded"
+          className="dark:bg-green-900 bg-green-600 text-white hover:bg-green-900/90 rounded"
           size="icon"
           onClick={onEdit}
         >
@@ -38,7 +38,7 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
         
         <Button
           variant="ghost"
-          className="bg-red-600 hover:bg-red-800 rounded"
+          className="bg-red-600 text-white hover:bg-red-800 rounded"
           size="icon"
           onClick={() => setIsDeleteModalOpen(true)}
         >
@@ -49,11 +49,11 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
       {/* Modal de confirmación */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-gray-900 p-6 rounded-lg max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-white mb-4">
+          <div className="dark:bg-gray-900 bg-white p-6 rounded-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-black dark:text-white mb-4">
               ¿Eliminar curso?
             </h3>
-            <p className="text-gray-300 mb-6">
+            <p className="dark:text-gray-300 mb-6 text-black">
               Esta acción no se puede deshacer. ¿Estás seguro de que quieres eliminar este curso?
             </p>
             
@@ -61,7 +61,7 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
               <Button
                 variant="destructive"
                 onClick={handleConfirmDelete}
-                className="bg-red-600 hover:bg-red-800"
+                className="bg-red-600 text-white hover:bg-red-800"
               >
                 Confirmar
               </Button>

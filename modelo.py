@@ -22,25 +22,28 @@ rol_schema=RolSchema()
 roles_schema=RolSchema(many=True)   
         
 class usuario(db.Model):
-    __tablename__='usuarios'
-    cedula=db.Column(db.Integer(), primary_key=True)
-    usuario_telegram=db.Column(db.String(50),nullable=False,unique=True)
-    nombre=db.Column(db.String(40), nullable=True)
-    apellido=db.Column(db.String(40), nullable=True)
-    correo=db.Column(db.String(50),nullable=False,unique=True)
-    contrasena=db.Column(db.String(200),nullable=False)
-    rol_id=db.Column(db.Integer())#db.ForeignKey('rol.rol_id'),nullable=False)
-    created_at=db.Column(db.DateTime(),default=datetime.now)
-    
-    def __init__(self,cedula,usuario_telegram, nombre,apellido,correo,contrasena,rol_id):
-        self.cedula= cedula
-        self.usuario_telegram= usuario_telegram
-        self.nombre=nombre
-        self.apellido=apellido
-        self.correo=correo
-        self.contrasena=contrasena
-        self.rol_id=rol_id
+    __tablename__ = 'usuarios'
+    cedula = db.Column(db.Integer(), primary_key=True)
+    usuario_telegram = db.Column(db.String(50), nullable=False, unique=True)
+    nombre = db.Column(db.String(40), nullable=True)
+    apellido = db.Column(db.String(40), nullable=True)
+    correo = db.Column(db.String(50), nullable=False, unique=True)
+    contrasena = db.Column(db.String(200), nullable=False)
+    rol_id = db.Column(db.Integer(), db.ForeignKey('roles.rol_id'), nullable=False)  # Definir como ForeignKey
+    created_at = db.Column(db.DateTime(), default=datetime.now)
 
+    # Relación con el modelo Rol
+    rol = db.relationship('Rol', backref='usuarios')  # Esto permite acceder al rol desde el usuario
+
+    def __init__(self, cedula, usuario_telegram, nombre, apellido, correo, contrasena, rol_id):
+        self.cedula = cedula
+        self.usuario_telegram = usuario_telegram
+        self.nombre = nombre
+        self.apellido = apellido
+        self.correo = correo
+        self.contrasena = contrasena
+        self.rol_id = rol_id
+        
 class UsuarioSchema(ma.Schema):
     cedula = fields.Integer()
     usuario_telegram = fields.String()
