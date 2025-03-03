@@ -44,7 +44,7 @@ export default function SidebarRoutes() {
   };
 
   return (
-    <div className="flex flex-col justify-between h-full">
+    <div className="flex flex-col dark:bg-slate-900 bg-white justify-between h-full">
       <div>
         <div className="p-2 md:p-4">
           <p className="text-slate-500 mb-2">General</p>

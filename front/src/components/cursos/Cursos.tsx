@@ -2,10 +2,10 @@ import { CursosTable } from "./components/CursosTable";
 
 export default function Cursos() {
   return (
-    <div className="mx-auto container flex justify-center p-2 gap-5 flex-col">
-        <div className="flex justify-center">
-          <CursosTable/>
-        </div>
+    <div className="container mx-auto p-4"> 
+      <div className="flex flex-col gap-5"> 
+        <CursosTable />
+      </div>
     </div>
-  )
+  );
 }

@@ -67,32 +67,35 @@ function Login() {
       // Mostrar toast de éxito
       toast.success("Inicio de sesión exitoso", {
         position: "top-center",
-        autoClose: 100, // Duración de 3 segundos
+        autoClose: 1000, // Duración de 1 segundo
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         theme: "colored", // Usar el tema coloreado
         style: {
-          backgroundColor: 'black', // Fondo negro
+          backgroundColor: 'green', // Fondo negro
           color: 'white', // Texto blanco
         },
       });
 
-      // Redirigir según el rol_nombre
-      switch (rolData.rol_nombre.toLowerCase()) {
-        case "estudiante":
-          navigate('/dashboard/estudiante');
-          break;
-        case "docente":
-          navigate('/dashboard/docente');
-          break;
-        case "administrador":
-          navigate('/dashboard/usuarios');
-          break;
-        default:
-          navigate('/');
-      }
+      // Retrasar la navegación por 1 segundo
+      setTimeout(() => {
+        switch (rolData.rol_nombre.toLowerCase()) {
+          case "estudiante":
+            navigate('/dashboard/estudiante');
+            break;
+          case "docente":
+            navigate('/dashboard/docente');
+            break;
+          case "administrador":
+            navigate('/dashboard/usuarios');
+            break;
+          default:
+            navigate('/');
+        }
+      }, 1000); // 1000 ms = 1 segundo
+
     } catch (error: any) {
       setError(error.message);
       console.error("Error:", error.message);

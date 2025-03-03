@@ -9,7 +9,7 @@ export function Logo() {
       onClick={() => navigate("/")}
     >
       <h1 className="font-bold text-2xl text-foreground">
-        <span className="text-primary">Cursos</span> Ceicec
+        <span className="text-primary">Cursos</span> Cecciec
       </h1>
     </div>
   );

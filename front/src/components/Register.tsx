@@ -107,9 +107,17 @@ function Register() {
         return;
       }
 
-      console.log(data);
       setSuccessMessage("Registro exitoso!");
       toast.success("Usuario registrado correctamente");
+      setCedula("");
+      setUsuario_telegram("");
+      setNombre("");
+      setApellido("");
+      setCorreo("");
+      setContrasena("");
+      setCedulaError("");
+      setContrasenaError("");
+
     } catch (error: any) {
       setError(error.message);
       toast.error(error.message);
@@ -230,7 +238,7 @@ function Register() {
               )}
             </div>
 
-            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800">
+            <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">
               Registrarme
             </Button>
           </form>
@@ -238,7 +246,7 @@ function Register() {
         <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-600 dark:text-slate-400">
             ¿Ya tienes una cuenta?{" "}
-            <Link to="/" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+            <Link to="/" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
               Iniciar sesión
             </Link>
           </p>

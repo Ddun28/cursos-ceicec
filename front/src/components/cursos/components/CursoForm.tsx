@@ -19,9 +19,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Modalidad } from "@/models/modalidad.model";
 import { Usuario } from "@/models/usuario.model";
+
 
 interface CursoFormProps {
   isOpen: boolean;
@@ -107,7 +108,7 @@ export const CursoForm = ({ isOpen, onClose, onSubmit, initialData, instructors,
                   <FormLabel>Instructor</FormLabel>
                   <FormControl>
                     <select
-                      className="dark:bg-black bg-white ml-6 border dark:border-white border-black rounded"
+                      className="dark:bg-black bg-white w-full border p-2 dark:border-white border-black rounded"
                       {...field}
                       onChange={(e) => field.onChange(Number(e.target.value))} 
                     >
@@ -205,7 +206,7 @@ export const CursoForm = ({ isOpen, onClose, onSubmit, initialData, instructors,
                 <FormLabel>Modalidad</FormLabel>
                 <FormControl>
                   <select
-                    className="dark:bg-black ml-6 bg-white border border-black dark:border-white rounded"
+                    className="dark:bg-black p-2 bg-white border w-full border-black dark:border-white rounded"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   >

@@ -1,4 +1,4 @@
-from ..modelo import usuario,usuario_schema, db, usuarios_schema
+from ..modelo import usuario, usuario_schema, db, usuarios_schema, Rol  
 from flask import request, jsonify
 import bcrypt
 from flask import Blueprint
@@ -14,37 +14,6 @@ import bcrypt
 
 ruta = Blueprint('modelo_blueprint', __name__)
 
-@ruta.route('/usuario', methods=['POST'])
-def agregar_usuario():
-    try:
-        # Obtén los datos JSON del request
-        data = request.get_json()
-
-        # Deserializa y valida los datos
-        usuario_data = usuario_schema.load(data)
-
-        # Validar que la cédula no esté ya en uso
-        existing_user = usuario.query.filter_by(cedula=usuario_data['cedula']).first()
-        if existing_user:
-            return jsonify({'error': 'La cédula ya está en uso'}), 400
-
-        # CIFRADO DE CONTRASEÑA (MUY IMPORTANTE)
-        contrasena_cifrada = bcrypt.hashpw(usuario_data['contrasena'].encode('utf-8'), bcrypt.gensalt())
-        usuario_data['contrasena'] = contrasena_cifrada.decode('utf-8')  # Guarda la versión cifrada
-
-        # Crea el nuevo usuario
-        nuevo_usuario = usuario(**usuario_data)
-        db.session.add(nuevo_usuario)
-        db.session.commit()
-
-        # Serializa el nuevo usuario usando el esquema antes de enviarlo en la respuesta
-        result = usuario_schema.dump(nuevo_usuario)
-        return jsonify(result), 201  # 201 Created y JSON serializado
-
-    except Exception as e:
-        db.session.rollback()  # Revierte los cambios en la base de datos
-        return jsonify({'error': str(e)}), 400
-    
 @ruta.route('/usuarios', methods=['GET'])
 def lista_usuarios():
     print("Se ha recibido una petición a /usuarios")  # Mensaje de depuración
@@ -58,6 +27,34 @@ def lista_usuarios():
         return jsonify(resultado)
     except Exception as e:
         print(f"Error en /usuarios: {e}")  # Mensaje de depuración
+        return jsonify({'error': str(e)}), 500
+
+@ruta.route('/usuarios/por-rol', methods=['GET'])
+def obtener_usuarios_por_rol():
+    try:
+        # Obtener el nombre del rol desde los parámetros de la URL
+        nombre_rol = request.args.get('rol', '')
+
+        if not nombre_rol:
+            return jsonify({'error': 'El parámetro "rol" es requerido'}), 400
+
+        # Buscar el rol en la base de datos
+        rol = Rol.query.filter_by(rol_nombre=nombre_rol).first()
+
+        if not rol:
+            return jsonify({'error': f'No se encontró el rol "{nombre_rol}"'}), 404
+
+        # Filtrar usuarios por el rol_id
+        usuarios = usuario.query.filter_by(rol_id=rol.rol_id).options(joinedload(usuario.rol)).all()
+
+        if not usuarios:
+            return jsonify({'mensaje': f'No hay usuarios asociados al rol "{nombre_rol}"'}), 200
+
+        # Serializar los resultados
+        resultado = usuarios_schema.dump(usuarios)
+        return jsonify(resultado), 200
+
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
     
 #@ruta.route('/usuarios/<cedula>', methods=['GET'])

@@ -1,18 +1,14 @@
-import { Input } from "@/components/ui/input"
 import {
     Sheet,
     SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
     SheetTrigger,
   } from "@/components/ui/sheet"
-import { Menu, Search } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { ModeToggle } from "./ToogleTheme/Toggletheme"; 
 import SidebarRoutes from "../Sidebar/SidebarRoutes/SidebarRoutes";
 
-  
+const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");  
 
 export function Navbar() {
   return (
@@ -30,6 +26,7 @@ export function Navbar() {
         <div className="relative w-[300px]">
       </div>
         <div className="flex gap-x-2 items-center">
+          <h1 className="lg:text-lg font-semibold">Bienvenido, {usuario.nombre || ""}, {usuario.apellido ? usuario.apellido[0] : ""}.</h1>
             <ModeToggle/>
         </div>
     </nav>
