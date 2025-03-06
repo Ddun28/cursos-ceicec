@@ -5,6 +5,12 @@ from flask import Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from .extensiones import db,ma
+from enum import Enum as PyEnum
+
+class EstadoPago(PyEnum):
+    CONFIRMADO = "CONFIRMADO"
+    EN_ESPERA = "EN_ESPERA"
+    CANCELADO = "CANCELADO"
 
 class Rol(db.Model):
     __tablename__ = 'roles'
@@ -105,17 +111,36 @@ curso_schema = CursoSchema()
 cursos_schema = CursoSchema(many=True)
 
 class cursousuario(db.Model):
-    __tablename__='usuario_curso'
-    curso_id=db.Column(db.Integer(), db.ForeignKey('cursos.curso_id'), primary_key=True, nullable=True)
-    cedula=db.Column(db.Integer(),db.ForeignKey('usuarios.cedula'), primary_key=True, nullable=True)
-    pago=db.Column(db.Integer(), nullable=False)
-    
-    def __str__(self):
-        return self.pago
+    __tablename__ = 'usuario_curso'
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True)  # ID único para cada inscripción
+    cedula = db.Column(db.Integer(), db.ForeignKey('usuarios.cedula'), nullable=False)  # Clave foránea a usuarios
+    cursos_inscritos = db.Column(db.JSON, nullable=False)  # Lista de IDs de cursos
+    monto = db.Column(db.Float(), nullable=False)  # Monto total del pago
+    moneda = db.Column(db.String(10), nullable=False)  # Moneda del pago (ej. "bsf", "usd")
+    estado_pago = db.Column(db.String(20), nullable=False, default='en_espera')  # Estado del pago
+    numero_referencia = db.Column(db.Integer(), nullable=True)  # Número de referencia (opcional)
+    fecha_inscripcion = db.Column(db.DateTime(), default=datetime.now)  # Fecha de la inscripción
+
+    # Relación muchos a uno con Usuario
+    usuario = db.relationship('usuario', backref='inscripciones')
+
+    def __init__(self, cedula, cursos_inscritos, monto, moneda, estado_pago, numero_referencia=None):
+        self.cedula = cedula
+        self.cursos_inscritos = cursos_inscritos
+        self.monto = monto
+        self.moneda = moneda
+        self.estado_pago = estado_pago
+        self.numero_referencia = numero_referencia
 
 class CursoUsuarioSchema(ma.Schema):
-    class Meta:
-        fields=('curso_id','cedula','pago')
-    
-cursousuario_schema=CursoUsuarioSchema()
-cursosusuarios_schema=CursoUsuarioSchema(many=True)   
+    id = fields.Int(dump_only=True)  # Solo se usa para serializar (no se espera en la entrada)
+    cedula = fields.Int(required=True)  # Cédula del usuario
+    cursos_inscritos = fields.List(fields.Int(), required=True)  # Lista de IDs de cursos
+    monto = fields.Float(required=True)  # Monto total del pago
+    moneda = fields.Str(required=True)  # Moneda del pago
+    estado_pago = fields.Str(required=True)  # Estado del pago
+    numero_referencia = fields.Int(allow_none=True)  # Número de referencia (opcional)
+    fecha_inscripcion = fields.DateTime(dump_only=True)  # Solo se usa para serializar
+
+cursousuario_schema = CursoUsuarioSchema()
+cursosusuarios_schema = CursoUsuarioSchema(many=True)

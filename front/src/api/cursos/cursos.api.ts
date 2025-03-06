@@ -1,21 +1,24 @@
 import { AxiosResponse } from "axios";
-import api from "../api"; 
-import { CursoPost, CursoSchemaPost } from "@/models/curso.model";
+import api from "../api";
+import { CursoSchema, CursoSchemaPost } from "@/models/curso.model";
+import { Curso, CursoPost } from "@/models/curso.model";
+import { z } from "zod";
 
 /**
  * Crear un nuevo curso
  */
-export const createCourse = async (curso: Omit<CursoPost, 'curso_id'>): Promise<void> => {
+export const createCourse = async (curso: CursoPost): Promise<void> => {
   try {
-
+    // Validar los datos con Zod
     const validatedData = CursoSchemaPost.safeParse(curso);
 
     if (!validatedData.success) {
       console.error("Error de validación:", validatedData.error);
-      return;
+      throw new Error("Datos inválidos");
     }
 
-    const res: AxiosResponse = await api.post("/curso", validatedData.data);
+    // Enviar la solicitud al backend
+    const res: AxiosResponse<Curso> = await api.post("/curso", validatedData.data);
 
     if (res.status === 201) {
       console.log("Curso creado:", res.data);
@@ -24,32 +27,25 @@ export const createCourse = async (curso: Omit<CursoPost, 'curso_id'>): Promise<
     }
   } catch (error) {
     console.error("Error:", error);
+    throw error;
   }
 };
 
 /**
  * Actualizar un curso existente
  */
-export const updateCourse = async (curso: CursoPost): Promise<void> => {
+export const updateCourse = async (curso: Curso): Promise<void> => {
   try {
-
-    const validatedData = CursoSchemaPost.safeParse(curso);
+    // Validar los datos con Zod
+    const validatedData = CursoSchema.safeParse(curso);
 
     if (!validatedData.success) {
       console.error("Error de validación:", validatedData.error);
-      return;
+      throw new Error("Datos inválidos");
     }
 
-    const res: AxiosResponse = await api.put(`/actualizar_cursos/${curso.curso_id}`, {
-      curso_id: curso.curso_id,
-      nombre: curso.nombre,
-      cedula_instructor: curso.cedula_instructor,
-      costo: curso.costo,
-      duracion: curso.duracion,
-      estado: curso.estado,
-      limite_estudiante: curso.limite_estudiante,
-      modalidad_id: curso.modalidad_id,
-    });
+    // Enviar la solicitud al backend
+    const res: AxiosResponse<Curso> = await api.put(`/actualizar_cursos/${curso.curso_id}`, validatedData.data);
 
     if (res.status === 200) {
       console.log("Curso actualizado:", res.data);
@@ -58,6 +54,7 @@ export const updateCourse = async (curso: CursoPost): Promise<void> => {
     }
   } catch (error) {
     console.error("Error:", error);
+    throw error;
   }
 };
 
@@ -67,7 +64,7 @@ export const updateCourse = async (curso: CursoPost): Promise<void> => {
 export const deleteCourse = async (id: string): Promise<void> => {
   if (!id) {
     console.error("ID del curso es requerido");
-    return;
+    throw new Error("ID del curso es requerido");
   }
 
   try {
@@ -80,22 +77,32 @@ export const deleteCourse = async (id: string): Promise<void> => {
     }
   } catch (error) {
     console.error("Error:", error);
+    throw error;
   }
 };
 
 /**
  * Obtener todos los cursos
  */
-export const getCourses = async (): Promise<any> => {
+export const getCourses = async (): Promise<Curso[]> => {
   try {
-    const res: AxiosResponse = await api.get("/lista_cursos");
+    const res: AxiosResponse<Curso[]> = await api.get("/lista_cursos");
 
     if (res.status === 200) {
-      return res.data; 
+      // Validar la respuesta con Zod
+      const validatedData = z.array(CursoSchema).safeParse(res.data);
+
+      if (!validatedData.success) {
+        console.error("Error de validación:", validatedData.error);
+        throw new Error("Datos inválidos recibidos del servidor");
+      }
+
+      return validatedData.data;
     } else {
       throw new Error("Error al obtener los cursos");
     }
   } catch (error) {
     console.error("Error:", error);
+    throw error;
   }
 };

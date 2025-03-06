@@ -24,6 +24,11 @@ export const CursosTable = () => {
   const [filteredInstructors, setFilteredInstructors] = useState<Usuario[]>([]); // Estado para los instructores filtrados
   const [selectedRole, setSelectedRole] = useState<string>('docente'); // Estado para el rol seleccionado, predeterminado a "docente"
 
+  // Obtener el usuario autenticado desde el localStorage
+  const usuario = JSON.parse(localStorage.getItem('usuario') || {});
+  const cedulaUsuario = usuario.cedula;
+  const rolUsuario = usuario.rol_nombre;
+
   useEffect(() => {
     fetchCourses();
     fetchInstructorsAndModalities();
@@ -56,7 +61,15 @@ export const CursosTable = () => {
     setLoading(true);
     try {
       const data = await getCourses();
-      setCourses(data);
+
+      // Filtrar cursos si el usuario es docente
+      if (rolUsuario === "docente") {
+        const cursosFiltrados = data.filter((curso) => curso.cedula_instructor === cedulaUsuario);
+        setCourses(cursosFiltrados);
+      } else {
+        // Si es administrador, mostrar todos los cursos
+        setCourses(data);
+      }
     } catch (error) {
       console.error("Error al obtener los cursos:", error);
     } finally {
@@ -138,7 +151,7 @@ export const CursosTable = () => {
       id: "actions",
       cell: ({ row }) => (
         <CursoActions
-          curso={row.original}
+          cursoId={row.original.curso_id} // Pasar el cursoId
           onEdit={() => {
             setCurrentCourse(row.original);
             setIsEditModalOpen(true);
@@ -146,39 +159,41 @@ export const CursosTable = () => {
           onDelete={() => handleDelete(row.original.curso_id!)}
         />
       ),
-    },
+    }
   ];
 
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Listado de Cursos</h1>
-        <Button className="dark:bg-blue-800 bg-blue-600 text-white hover:bg-blue-950 rounded" onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Crear Curso
-        </Button>
+          <Button className="dark:bg-blue-800 bg-blue-600 text-white hover:bg-blue-950 rounded" onClick={() => setIsCreateModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Crear Curso
+          </Button>
       </div>
 
       <DataTable columns={columns} data={courses} />
 
-      <CursoForm
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreate}
-        instructors={filteredInstructors} // Usa los instructores filtrados
-        modalities={modalities} 
-      />
 
-      {currentCourse && (
-        <CursoForm
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSubmit={handleEdit}
-          initialData={currentCourse}
-          instructors={filteredInstructors} // Usa los instructores filtrados
-          modalities={modalities} 
-        />
-      )}
+        <>
+          <CursoForm
+            isOpen={isCreateModalOpen}
+            onClose={() => setIsCreateModalOpen(false)}
+            onSubmit={handleCreate}
+            instructors={filteredInstructors} // Usa los instructores filtrados
+            modalities={modalities} 
+          />
 
+          {currentCourse && (
+            <CursoForm
+              isOpen={isEditModalOpen}
+              onClose={() => setIsEditModalOpen(false)}
+              onSubmit={handleEdit}
+              initialData={currentCourse}
+              instructors={filteredInstructors} // Usa los instructores filtrados
+              modalities={modalities} 
+            />
+          )}
+        </>
     </div>
   );
 };

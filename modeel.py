@@ -1,13 +1,21 @@
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, JSON, Float, Enum
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from datetime import datetime
+from enum import Enum as PyEnum
+from sqlalchemy.dialects.postgresql import JSONB
 
-engine = create_engine('postgresql://cecciec:cecciec@localhost:5432/proyecto3')
+engine = create_engine('postgresql://dun:dun@localhost:5432/proyecto3')
 
 class Base(DeclarativeBase):
     pass  # No es necesario ningún argumento
+
+# Definir un Enum para los estados de pago
+class EstadoPago(PyEnum):
+    CONFIRMADO = "confirmado"
+    EN_ESPERA = "en_espera"
+    CANCELADO = "cancelado"
 
 class Rol(Base):
     __tablename__ = 'roles'
@@ -27,6 +35,9 @@ class Usuario(Base):
     contrasena = Column(String(200), nullable=False)
     rol_id = Column(Integer(), ForeignKey('roles.rol_id'), nullable=False)
     created_at = Column(DateTime(), default=datetime.now)
+
+    # Relación uno a muchos con CursoUsuario
+    inscripciones = relationship("CursoUsuario", back_populates="usuario")
 
 class Modalidad(Base):
     __tablename__ = 'modalidad'
@@ -52,16 +63,22 @@ class Curso(Base):
 
 class CursoUsuario(Base):
     __tablename__ = 'usuario_curso'
-    curso_id = Column(Integer(), ForeignKey('cursos.curso_id'), primary_key=True, nullable=False)
-    cedula = Column(Integer(), ForeignKey('usuarios.cedula'), primary_key=True, nullable=False)
-    pago = Column(Integer(), nullable=False)
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    cedula = Column(Integer(), ForeignKey('usuarios.cedula'), nullable=False)
+    cursos_inscritos = Column(JSONB, nullable=False)  # Cambiar a JSONB
+    monto = Column(Float(), nullable=False)
+    moneda = Column(String(10), nullable=False)
+    estado_pago = Column(Enum(EstadoPago), nullable=False, default=EstadoPago.EN_ESPERA)
+    numero_referencia = Column(Integer(), nullable=True)
+    fecha_inscripcion = Column(DateTime(), default=datetime.now)
 
-    def __str__(self):
-        return str(self.pago)  # Convertir a string
+    # Relación muchos a uno con Usuario
+    usuario = relationship("Usuario", back_populates="inscripciones")
 
 Session = sessionmaker(engine)
 session = Session()
 
 if __name__ == '__main__':
+    # Eliminar todas las tablas y crear de nuevo
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)

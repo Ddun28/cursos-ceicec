@@ -1,27 +1,21 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, SquarePen } from "lucide-react";
-import { toast } from "react-toastify";
-import { CursoPost } from "@/models/curso.model";
+import { UsuariosInscritosModal } from "./UsuariosInscritosModal";
+import { SquarePen, Trash2, Eye } from "lucide-react"; // Importar el ícono Eye
 
 interface CursoActionsProps {
-  curso: CursoPost;
   onEdit: () => void;
   onDelete: () => void;
+  cursoId: number;
 }
 
-export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
+export const CursoActions = ({ onEdit, onDelete, cursoId }: CursoActionsProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUsuariosModalOpen, setIsUsuariosModalOpen] = useState(false);
 
   const handleConfirmDelete = () => {
     onDelete();
     setIsDeleteModalOpen(false);
-    toast.success("Curso eliminado correctamente", {
-      style: {
-        backgroundColor: 'black',
-        color: 'white',
-      },
-    });
   };
 
   return (
@@ -35,7 +29,7 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
         >
           <SquarePen className="h-4 w-4" />
         </Button>
-        
+
         <Button
           variant="ghost"
           className="bg-red-600 text-white hover:bg-red-800 rounded"
@@ -44,9 +38,19 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
         >
           <Trash2 className="h-4 w-4" />
         </Button>
+
+        {/* Botón para ver usuarios inscritos */}
+        <Button
+          variant="ghost"
+          className="dark:bg-blue-900 bg-blue-600 text-white hover:bg-blue-900/90 rounded flex items-center gap-2" // Añadir flex y gap
+          onClick={() => setIsUsuariosModalOpen(true)}
+        >
+          <Eye className="h-4 w-4" /> {/* Ícono de ojo */}
+          <span>Ver Inscritos</span> {/* Texto del botón */}
+        </Button>
       </div>
 
-      {/* Modal de confirmación */}
+      {/* Modal de confirmación de eliminación */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
           <div className="dark:bg-gray-900 bg-white p-6 rounded-lg max-w-sm w-full">
@@ -77,6 +81,13 @@ export const CursoActions = ({ onEdit, onDelete }: CursoActionsProps) => {
           </div>
         </div>
       )}
+
+      {/* Modal de usuarios inscritos */}
+      <UsuariosInscritosModal
+        cursoId={cursoId}
+        isOpen={isUsuariosModalOpen}
+        onClose={() => setIsUsuariosModalOpen(false)}
+      />
     </>
   );
 };
