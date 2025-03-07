@@ -18,7 +18,6 @@ export const CursoSchema = z.object({
 
 // Esquema para crear un nuevo curso (sin curso_id, instructor ni modalidad)
 export const CursoSchemaPost = CursoSchema.omit({
-  curso_id: true,
   instructor: true,
   modalidad: true,
 });

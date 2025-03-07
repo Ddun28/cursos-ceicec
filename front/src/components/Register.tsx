@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Eye, EyeOff } from "lucide-react"; // Importar íconos para mostrar/ocultar contraseña
 
 function Register() {
   const [cedula, setCedula] = useState("");
@@ -18,7 +19,7 @@ function Register() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [cedulaError, setCedulaError] = useState("");
-  const [contrasenaError, setContrasenaError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
 
   const handleCedulaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputCedula = e.target.value;
@@ -29,24 +30,6 @@ function Register() {
       setCedulaError("Cédula debe contener solo números");
     } else {
       setCedulaError("");
-    }
-  };
-
-  const handleContrasenaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputContrasena = e.target.value;
-    setContrasena(inputContrasena);
-
-    const cedulaValue = cedula; // Obtén el valor actual de la cédula
-
-    const regex = new RegExp(`^${cedulaValue}\\*$`); // Cédula seguida de *
-    const isValidContrasena = regex.test(inputContrasena);
-
-    if (!isValidContrasena && inputContrasena !== "") {
-      setContrasenaError(
-        `Debe ser la cédula (${cedulaValue}) seguida de un asterisco (*)`
-      );
-    } else {
-      setContrasenaError("");
     }
   };
 
@@ -68,9 +51,9 @@ function Register() {
       return;
     }
 
-    if (cedulaError || contrasenaError) {
-      setError(cedulaError || contrasenaError);
-      toast.error(cedulaError || contrasenaError);
+    if (cedulaError) {
+      setError(cedulaError);
+      toast.error(cedulaError);
       return;
     }
 
@@ -87,7 +70,7 @@ function Register() {
           cedula,
           usuario_telegram,
           contrasena,
-          rol_id: 1, 
+          rol_id: 3,
         }),
       });
 
@@ -116,7 +99,6 @@ function Register() {
       setCorreo("");
       setContrasena("");
       setCedulaError("");
-      setContrasenaError("");
 
     } catch (error: any) {
       setError(error.message);
@@ -222,20 +204,24 @@ function Register() {
               <Label htmlFor="contrasena" className="text-gray-700 dark:text-white">
                 Contraseña
               </Label>
-              <Input
-                id="contrasena"
-                type="password"
-                value={contrasena}
-                onChange={handleContrasenaChange}
-                placeholder="Contraseña"
-                required
-                className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400"
-              />
-              {contrasenaError && (
-                <Alert variant="destructive" className="mt-2">
-                  <AlertDescription>{contrasenaError}</AlertDescription>
-                </Alert>
-              )}
+              <div className="relative">
+                <Input
+                  id="contrasena"
+                  type={showPassword ? "text" : "password"} // Cambiar el tipo de entrada
+                  value={contrasena}
+                  onChange={(e) => setContrasena(e.target.value)}
+                  placeholder="Contraseña"
+                  required
+                  className="bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-slate-400"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <Button type="submit" className="w-full bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">

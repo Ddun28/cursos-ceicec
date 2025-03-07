@@ -34,18 +34,13 @@ export const createCourse = async (curso: CursoPost): Promise<void> => {
 /**
  * Actualizar un curso existente
  */
+/**
+ * Actualizar un curso existente
+ */
 export const updateCourse = async (curso: Curso): Promise<void> => {
   try {
-    // Validar los datos con Zod
-    const validatedData = CursoSchema.safeParse(curso);
-
-    if (!validatedData.success) {
-      console.error("Error de validación:", validatedData.error);
-      throw new Error("Datos inválidos");
-    }
-
-    // Enviar la solicitud al backend
-    const res: AxiosResponse<Curso> = await api.put(`/actualizar_cursos/${curso.curso_id}`, validatedData.data);
+    // Enviar la solicitud al backend sin validación
+    const res: AxiosResponse<Curso> = await api.put(`/actualizar_cursos/${curso.curso_id}`, curso);
 
     if (res.status === 200) {
       console.log("Curso actualizado:", res.data);

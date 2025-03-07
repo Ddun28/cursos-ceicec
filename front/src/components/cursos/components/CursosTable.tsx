@@ -90,7 +90,7 @@ export const CursosTable = () => {
   };
 
   const handleEdit = async (curso: CursoPost) => {
-    try {
+    try {      
       await updateCourse(curso);
       await fetchCourses();
       setIsEditModalOpen(false);
@@ -151,7 +151,7 @@ export const CursosTable = () => {
       id: "actions",
       cell: ({ row }) => (
         <CursoActions
-          cursoId={row.original.curso_id} // Pasar el cursoId
+          cursoId={row.original.curso_id} 
           onEdit={() => {
             setCurrentCourse(row.original);
             setIsEditModalOpen(true);

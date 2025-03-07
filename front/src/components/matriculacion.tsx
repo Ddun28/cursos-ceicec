@@ -148,12 +148,12 @@ export const ListaCourses: React.FC = () => {
         return (
           <div key={course.curso_id} className="border border-black-300 rounded-lg p-5 w-72 shadow-md">
             <h3 className="mt-0 text-lg font-semibold">{course.nombre}</h3>
-            <p>Instructor: {course.cedula_instructor}</p>
+            <p>Instructor: {course.instructor?.nombre || 'No disponible'}</p>
             <p>Costo: {course.costo} Bolívares</p>
             <p>Duración: {course.duracion}</p>
             <p>Estado: {course.estado ? 'Activo' : 'Inactivo'}</p>
             <p>Límite de Estudiantes: {course.limite_estudiante}</p>
-            <p>Modalidad: {course.modalidad_id}</p>
+            <p>Modalidad: {course.modalidad?.modalidad_nombre || 'No disponible'}</p>
             <button 
               onClick={() => agregarAlCarrito(course)} 
               className="mt-3 inline-block bg-green-600 text-white py-2 px-4 rounded hover:bg-green-500 transition"
