@@ -70,7 +70,7 @@ function Register() {
           cedula,
           usuario_telegram,
           contrasena,
-          rol_id: 3,
+          rol_id: 1,
         }),
       });
 

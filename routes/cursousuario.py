@@ -126,38 +126,13 @@ def lista_pago_usuario(cedula):
     else:
         return jsonify({"error": "Usuario no encontrado"}), 404
 
-@routa.route('/actualizar_pago/<int:cedula>', methods=['PUT'])  # Asegúrate de que cedula sea un entero
-def actualizar_curso(cedula):
-    act_pago = cursousuario.query.filter_by(cedula=cedula).first()  # Cambié a filter_by
-    if not act_pago:
-        return jsonify({"error": "Usuario no encontrado"}), 404
-
+@routa.route('/actualizar_estado_pago/<int:id>/<string:cedula>', methods=['PUT'])
+def actualizar_estado_pago(id, cedula):
     try:
-        data = request.get_json()
-        pago_data = cursousuario_schema.load(data, partial=True)
-
-        # Actualiza los atributos del usuario existente
-        for key, value in pago_data.items():
-            setattr(act_pago, key, value)
-        db.session.commit()
-        result = cursousuario_schema.dump(act_pago)
-        return jsonify(result), 200
-
-    except ValidationError as e:
-        db.session.rollback()
-        return jsonify({'error': 'Datos inválidos', 'details': e.messages}), 400
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 400
-
-@routa.route('/actualizar_estado_pago/<int:cedula>', methods=['PUT'])
-def actualizar_estado_pago(cedula):
-    try:
-        # Obtener el registro del usuario inscrito
-        usuario_inscrito = cursousuario.query.filter_by(cedula=cedula).first()
+        # Obtener el registro del usuario inscrito por su ID y cédula
+        usuario_inscrito = cursousuario.query.filter_by(id=id, cedula=cedula).first()
         if not usuario_inscrito:
-            return jsonify({"error": "Usuario no encontrado"}), 404
+            return jsonify({"error": "Inscripción no encontrada"}), 404
 
         # Obtener el nuevo estado de pago desde el cuerpo de la solicitud
         data = request.get_json()
@@ -167,9 +142,15 @@ def actualizar_estado_pago(cedula):
         if nuevo_estado not in [EstadoPago.CONFIRMADO.value, EstadoPago.CANCELADO.value]:
             return jsonify({"error": "Estado de pago no válido"}), 400
 
-        # Actualizar el estado de pago
-        usuario_inscrito.estado_pago = nuevo_estado
+        # Actualizar el estado de pago de todos los registros con la misma cédula
+        registros_actualizados = cursousuario.query.filter_by(cedula=cedula).update(
+            {"estado_pago": nuevo_estado}
+        )
         db.session.commit()
+
+        # Verificar si se actualizaron registros
+        if registros_actualizados == 0:
+            return jsonify({"error": "No se encontraron registros para actualizar"}), 404
 
         # Devolver la respuesta actualizada
         result = cursousuario_schema.dump(usuario_inscrito)
@@ -178,6 +159,7 @@ def actualizar_estado_pago(cedula):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
 
 @routa.route('/eliminar_curso/<cedula>', methods=['DELETE'])
 def eliminar_curso(cedula):

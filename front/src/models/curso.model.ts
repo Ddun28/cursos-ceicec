@@ -12,6 +12,7 @@ export const CursoSchema = z.object({
   estado: z.boolean(),
   limite_estudiante: z.number().min(1, "El límite de estudiantes debe ser al menos 1"),
   modalidad_id: z.number().min(1, "El ID de la modalidad es requerido"),
+  descripcion: z.string().optional(), 
   instructor: UsuarioSchema, // Relación con el instructor
   modalidad: ModalidadSchema, // Relación con la modalidad
 });

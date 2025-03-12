@@ -217,7 +217,7 @@ const ListaUsuarios: React.FC = () => {
                       id="rol_id"
                       value={rol_id}
                       onChange={(e) => setRolId(Number(e.target.value))}
-                      className="w-full p-2 border rounded"
+                      className="w-full dark:bg-slate-900 p-2 border rounded"
                       required
                     >
                       <option value="">Selecciona un rol</option>

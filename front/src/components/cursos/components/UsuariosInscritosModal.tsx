@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "react-toastify";
 import api from "@/api/api";
+import { format } from 'date-fns';
 
 interface UsuarioInscrito {
   cedula: number;
@@ -22,6 +23,7 @@ interface UsuarioInscrito {
     nombre: string;
     rol_id: number;
     usuario_telegram: string;
+    updated_at: string;
   };
 }
 
@@ -37,7 +39,6 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
   const [selectedUsuario, setSelectedUsuario] = useState<UsuarioInscrito | null>(null);
   const [isPagoDialogOpen, setIsPagoDialogOpen] = useState<boolean>(false);
 
-  // Obtener los usuarios inscritos
   useEffect(() => {
     if (isOpen) {
       fetchUsuariosInscritos();
@@ -48,19 +49,15 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
     setLoading(true);
     try {
       const response = await api.get(`/curso/${cursoId}/usuarios`);
-      
-      // Si la respuesta no tiene usuarios, mostrar el mensaje de error
       if (response.data.length === 0) {
         toast.error("No hay usuarios inscritos en este curso");
       } else {
         setUsuarios(response.data);
       }
     } catch (error) {
-      // Si hay un error en la solicitud, mostrar el mensaje de error del servidor
       if (error.response && error.response.data && error.response.data.message) {
         toast.error(error.response.data.message);
       } else {
-        // Mensaje genérico si no hay un mensaje específico
         toast.error("Error al obtener los usuarios inscritos");
       }
     } finally {
@@ -68,37 +65,38 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
     }
   };
 
-  // Abrir diálogo de verificación de pago
   const handleOpenPagoDialog = (usuario: UsuarioInscrito) => {
     setSelectedUsuario(usuario);
     setIsPagoDialogOpen(true);
   };
 
-  // Cerrar diálogo de verificación de pago
   const handleClosePagoDialog = () => {
     setIsPagoDialogOpen(false);
     setSelectedUsuario(null);
   };
 
-  // Verificar pago (confirmar o rechazar)
   const handleVerificarPago = async (estado: "CONFIRMADO" | "CANCELADO") => {
     if (selectedUsuario) {
       try {
-        // Enviar la solicitud PUT al backend para actualizar el estado del pago
-        await api.put(`/actualizar_estado_pago/${selectedUsuario.cedula}`, {
+        await api.put(`/actualizar_estado_pago/${selectedUsuario.id}/${selectedUsuario.cedula}`, {
           estado_pago: estado,
         });
 
-        // Actualizar el estado en el frontend
         setUsuarios((prevUsuarios) =>
           prevUsuarios.map((usuario) =>
             usuario.cedula === selectedUsuario.cedula
-              ? { ...usuario, estado_pago: estado }
+              ? {
+                  ...usuario,
+                  estado_pago: estado,
+                  usuario: {
+                    ...usuario.usuario,
+                    updated_at: new Date().toISOString(), 
+                  },
+                }
               : usuario
           )
         );
 
-        // Mostrar mensaje de éxito
         toast.success(`Pago ${estado === "CONFIRMADO" ? "confirmado" : "rechazado"} correctamente`);
         handleClosePagoDialog();
       } catch (error) {
@@ -129,6 +127,7 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
                   <TableHead>Cédula</TableHead>
                   <TableHead>Correo</TableHead>
                   <TableHead>Usuario de Telegram</TableHead>
+                  <TableHead>Fecha de Inscripción</TableHead>
                   <TableHead>Estado de Pago</TableHead>
                   <TableHead>Acciones</TableHead>
                 </TableRow>
@@ -141,10 +140,11 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
                     <TableCell>{usuario.cedula}</TableCell>
                     <TableCell>{usuario.usuario.correo}</TableCell>
                     <TableCell>{usuario.usuario.usuario_telegram}</TableCell>
+                    <TableCell>{format(new Date(usuario.fecha_inscripcion), 'dd/MM/yyyy HH:mm:ss')}</TableCell>
                     <TableCell>
-                    {usuario.estado_pago === "EN_ESPERA"
-                         ? "En espera"
-                         : usuario.estado_pago === "CONFIRMADO"
+                      {usuario.estado_pago === "EN_ESPERA"
+                        ? "En espera"
+                        : usuario.estado_pago === "CONFIRMADO"
                         ? "Confirmado"
                         : "Cancelado"}
                     </TableCell>
@@ -177,7 +177,6 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
         </DialogContent>
       </Dialog>
 
-      {/* Diálogo de verificación de pago */}
       <Dialog open={isPagoDialogOpen} onOpenChange={handleClosePagoDialog}>
         <DialogContent className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 max-w-md">
           <DialogHeader>
@@ -207,6 +206,14 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
                   <span className="text-gray-600 dark:text-gray-400">{selectedUsuario.monto}</span>
                 </p>
               </div>
+
+              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <strong className="block text-gray-900 dark:text-white">Fecha del Pago:</strong>
+                  <span className="text-gray-600 dark:text-gray-400">{format(new Date(selectedUsuario.usuario.created_at), 'dd/MM/yyyy HH:mm:ss')}</span>
+                </p>
+              </div>
+
 
               <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
                 <p className="text-sm text-gray-700 dark:text-gray-300">

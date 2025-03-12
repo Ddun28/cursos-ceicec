@@ -1,6 +1,6 @@
-// ModalInscripcion.tsx
 import React, { useState, useEffect } from 'react';
 import { CursoUsuarioPost } from '@/models/cursoUsuario.model';
+import { toast } from "react-toastify";
 
 interface Courses {
   curso_id: number;
@@ -39,23 +39,23 @@ const ModalInscripcion: React.FC<ModalProps> = ({
       const usuario = JSON.parse(usuarioStorage); // Convertir de string a objeto
       setCedula(usuario.cedula); // Extraer la cédula y guardarla en el estado
     } else {
-      alert('No se encontró el usuario en el localStorage. Por favor, inicie sesión nuevamente.');
+      toast.error('Por favor, inicie sesión nuevamente.');
     }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!cedula) {
-      alert('No se pudo obtener la cédula. Por favor, inicie sesión nuevamente.');
+      toast.error('No se pudo obtener la cédula. Por favor, inicie sesión nuevamente.');
       return;
     }
-
+  
     if (!metodoPago) {
-      alert('Seleccione un método de pago');
+      toast.error('Seleccione un método de pago');
       return;
     }
-
+  
     // Datos para enviar al backend
     const cursoUsuarioData: CursoUsuarioPost = {
       cedula: cedula,
@@ -65,14 +65,22 @@ const ModalInscripcion: React.FC<ModalProps> = ({
       estado_pago: 'EN_ESPERA',
       numero_referencia: metodoPago === 'movil' ? parseInt(datosTarjeta.numero) : undefined,
     };
-
+  
     try {
       // Enviar los datos al backend usando la función pasada como prop
       await createCursoUsuario(cursoUsuarioData);
-      onCerrar(); // Cerrar el modal después de un pago exitoso
+  
+      // Eliminar el carrito del localStorage
+      localStorage.removeItem('carrito');
+  
+      // Mostrar mensaje de éxito
+      toast.success("Se registró el pago correctamente");
+  
+      // Cerrar el modal después de un pago exitoso
+      onCerrar();
     } catch (error) {
       console.error("Error al crear el registro:", error);
-      alert("Hubo un error al procesar el pago. Inténtelo de nuevo.");
+      toast.error("Hubo un error al procesar el pago. Inténtelo de nuevo.");
     }
   };
 
@@ -109,7 +117,7 @@ const ModalInscripcion: React.FC<ModalProps> = ({
             <select
               value={metodoPago}
               onChange={(e) => setMetodoPago(e.target.value)}
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border dark:bg-black rounded-md"
               required
             >
               <option value="">Seleccionar...</option>
@@ -122,7 +130,7 @@ const ModalInscripcion: React.FC<ModalProps> = ({
 
           {metodoPago === 'movil' && (
             <div className="mb-4">
-              <p className="text-sm bg-gray-100 p-3 rounded-md">
+              <p className="text-sm dark:bg-black bg-gray-100 p-3 rounded-md">
                 Realice el pago móvil al siguiente número:
                 <br />
                 <strong>Banco de Venezuela (0102)</strong>
@@ -135,7 +143,7 @@ const ModalInscripcion: React.FC<ModalProps> = ({
               <input
                 type="text"
                 placeholder="Ingrese el número de referencia"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border dark:bg-black rounded-md"
                 required
                 value={datosTarjeta.numero}
                 onChange={(e) => setDatosTarjeta({ ...datosTarjeta, numero: e.target.value })}

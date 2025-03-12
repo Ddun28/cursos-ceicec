@@ -22,7 +22,7 @@ export const CursosTable = () => {
   const [instructors, setInstructors] = useState<Usuario[]>([]);
   const [modalities, setModalities] = useState<Modalidad[]>([]);  
   const [filteredInstructors, setFilteredInstructors] = useState<Usuario[]>([]); // Estado para los instructores filtrados
-  const [selectedRole, setSelectedRole] = useState<string>('docente'); // Estado para el rol seleccionado, predeterminado a "docente"
+  const [selectedRole, setSelectedRole] = useState<string>('administrativo'); // Estado para el rol seleccionado, predeterminado a "docente"
 
   // Obtener el usuario autenticado desde el localStorage
   const usuario = JSON.parse(localStorage.getItem('usuario') || {});
@@ -62,12 +62,10 @@ export const CursosTable = () => {
     try {
       const data = await getCourses();
 
-      // Filtrar cursos si el usuario es docente
-      if (rolUsuario === "docente") {
+      if (rolUsuario === "administrativo") {
         const cursosFiltrados = data.filter((curso) => curso.cedula_instructor === cedulaUsuario);
         setCourses(cursosFiltrados);
       } else {
-        // Si es administrador, mostrar todos los cursos
         setCourses(data);
       }
     } catch (error) {

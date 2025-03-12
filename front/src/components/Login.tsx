@@ -85,10 +85,10 @@ function Login() {
           case "estudiante":
             navigate('/dashboard/estudiante');
             break;
-          case "docente":
+          case "administrativo":
             navigate('/dashboard/docente');
             break;
-          case "administrador":
+          case "superusuario":
             navigate('/dashboard/usuarios');
             break;
           default:
