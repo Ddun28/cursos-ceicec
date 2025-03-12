@@ -4,6 +4,7 @@ Automat==20.2.0
 Babel==2.8.0
 bcrypt==3.2.0
 blinker==1.9.0
+build==1.2.2.post1
 certifi==2020.6.20
 chardet==4.0.0
 click==8.1.8
@@ -46,6 +47,7 @@ more-itertools==8.10.0
 netifaces==0.11.0
 oauthlib==3.2.0
 packaging==24.2
+pip-tools==7.4.1
 psycopg2-binary==2.9.10
 pyasn1==0.4.8
 pyasn1-modules==0.2.1
@@ -56,6 +58,7 @@ PyHamcrest==2.0.2
 PyJWT==2.3.0
 pyOpenSSL==21.0.0
 pyparsing==2.4.7
+pyproject_hooks==1.2.0
 pyrsistent==0.18.1
 pyserial==3.5
 python-apt==2.4.0+ubuntu4
@@ -67,6 +70,7 @@ service-identity==18.1.0
 six==1.16.0
 SQLAlchemy==2.0.38
 systemd-python==234
+tomli==2.2.1
 Twisted==22.1.0
 typing_extensions==4.12.2
 ubuntu-pro-client==8001

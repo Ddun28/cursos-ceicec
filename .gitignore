@@ -6,4 +6,5 @@ __pycache__/
 # Entornos virtuales y dependencias
 venv/
 .venv/
+myenv/
 flask/  # Solo si es un entorno virtual o carpeta a ignorar
