@@ -15,7 +15,7 @@ interface Usuario {
   apellido: string;
   correo: string;
   rol_id: number;
-  rol_nombre: string; // Agregamos rol_nombre
+  rol_nombre: string;
   contrasena?: string;
   created_at?: string;
 }
@@ -35,28 +35,59 @@ const UpdateUsuario: React.FC = () => {
   const usuarioLocalStorage = JSON.parse(localStorage.getItem('usuario') || '{}');
 
   useEffect(() => {
-    // Verificar si el usuario está en el localStorage
-    if (usuarioLocalStorage && usuarioLocalStorage.cedula) {
-      // Rellenar el formulario con los datos del localStorage
-      setValue('cedula', usuarioLocalStorage.cedula);
-      setValue('usuario_telegram', usuarioLocalStorage.usuario_telegram);
-      setValue('nombre', usuarioLocalStorage.nombre);
-      setValue('apellido', usuarioLocalStorage.apellido);
-      setValue('correo', usuarioLocalStorage.correo);
-      setValue('rol_id', usuarioLocalStorage.rol_id);
-      setValue('rol_nombre', usuarioLocalStorage.rol_nombre); // Rellenar rol_nombre
-      setValue('contrasena', usuarioLocalStorage.contrasena || '');
-    }
-  }, [usuarioLocalStorage, setValue]);
+    const fetchUsuario = async () => {
+      setLoading(true);
+      try {
+        if (cedula) {
+          // Si hay cédula en la URL, obtener los datos del backend
+          const response = await axios.get(`http://localhost:5000/usuarios/${cedula}`);
+          const usuarioData = response.data;
+
+          // Rellenar el formulario con los datos del usuario
+          setValue('cedula', usuarioData.cedula);
+          setValue('usuario_telegram', usuarioData.usuario_telegram);
+          setValue('nombre', usuarioData.nombre);
+          setValue('apellido', usuarioData.apellido);
+          setValue('correo', usuarioData.correo);
+          setValue('rol_id', usuarioData.rol_id);
+          setValue('rol_nombre', usuarioData.rol_nombre); // Nombre del rol
+          setValue('contrasena', ''); // Dejar la contraseña vacía por defecto
+        } else if (usuarioLocalStorage && usuarioLocalStorage.cedula) {
+          // Si no hay cédula en la URL, usar los datos del localStorage
+          setValue('cedula', usuarioLocalStorage.cedula);
+          setValue('usuario_telegram', usuarioLocalStorage.usuario_telegram);
+          setValue('nombre', usuarioLocalStorage.nombre);
+          setValue('apellido', usuarioLocalStorage.apellido);
+          setValue('correo', usuarioLocalStorage.correo);
+          setValue('rol_id', usuarioLocalStorage.rol_id);
+          setValue('rol_nombre', usuarioLocalStorage.rol_nombre); // Nombre del rol
+          setValue('contrasena', ''); // Dejar la contraseña vacía por defecto
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        toast.error('Error al cargar los datos del usuario', {
+          position: 'top-center',
+          autoClose: 3000,
+          theme: 'colored',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsuario();
+  }, [cedula, setValue, usuarioLocalStorage]);
 
   const onSubmit: SubmitHandler<Usuario> = async (data) => {
     setLoading(true);
     try {
-      // Eliminar campos innecesarios antes de enviar
       const { cedula, created_at, rol_nombre, ...formValuesWithoutCreatedAt } = data;
 
+      // Determinar la cédula a usar (de la URL o del localStorage)
+      const cedulaActual = cedula || usuarioLocalStorage.cedula;
+
       const response = await axios.put(
-        `http://localhost:5000/actualizar/${cedula}`,
+        `http://localhost:5000/actualizar/${cedulaActual}`,
         formValuesWithoutCreatedAt
       );
 

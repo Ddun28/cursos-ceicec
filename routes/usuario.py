@@ -125,22 +125,32 @@ def obtener_usuarios_por_rol():
 #        return jsonify({'error': str(e)}), 400
 #    
 
-@ruta.route('/usuarios/<int:cedula>', methods=['GET'])  # <int:cedula> is crucial
+@ruta.route('/usuarios/<int:cedula>', methods=['GET'])
 def seleccionar_usuario(cedula):
-    usuariounico = usuario.query.get_or_404(cedula)
-    return usuario_schema.jsonify(usuariounico)
+    try:
 
-@ruta.route('/actualizar/<int:cedula>', methods=['PUT'])  # <int:cedula> is crucial
+        usuariounico = usuario.query.options(joinedload(usuario.rol)).get_or_404(cedula)
+        
+        resultado = usuario_schema.dump(usuariounico)
+        resultado['rol_nombre'] = usuariounico.rol.rol_nombre if usuariounico.rol else None
+        
+        return jsonify(resultado), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@ruta.route('/actualizar/<int:cedula>', methods=['PUT'])
 def actualizar_usuario(cedula):
     act_usuario = usuario.query.get_or_404(cedula)
     try:
         data = request.get_json()
         usuario_data = usuario_schema.load(data, partial=True)
 
-        if 'contrasena' in usuario_data:
+        # Cifrar la contraseña si se proporciona
+        if 'contrasena' in usuario_data and usuario_data['contrasena']:
             contrasena_cifrada = bcrypt.hashpw(usuario_data['contrasena'].encode('utf-8'), bcrypt.gensalt())
             usuario_data['contrasena'] = contrasena_cifrada.decode('utf-8')
 
+        # Actualizar los campos del usuario
         for key, value in usuario_data.items():
             setattr(act_usuario, key, value)
 
