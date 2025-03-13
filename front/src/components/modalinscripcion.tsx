@@ -79,6 +79,8 @@ const ModalInscripcion: React.FC<ModalProps> = ({
       // Mostrar mensaje de éxito
       toast.success("Se registró el pago correctamente");
   
+      window.location.reload();
+
       // Cerrar el modal después de un pago exitoso
       onCerrar();
     } catch (error) {
