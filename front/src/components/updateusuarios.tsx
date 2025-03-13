@@ -5,6 +5,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -20,48 +21,52 @@ interface Usuario {
   created_at?: string;
 }
 
+interface Rol {
+  rol_id: number;
+  rol_nombre: string;
+}
+
 const UpdateUsuario: React.FC = () => {
   const { cedula } = useParams<{ cedula: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [roles, setRoles] = useState<Rol[]>([]);
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<Usuario>();
 
-  // Obtener los datos del usuario desde el localStorage
   const usuarioLocalStorage = JSON.parse(localStorage.getItem('usuario') || '{}');
+
+  const isSuperusuario = usuarioLocalStorage.rol_nombre === 'superusuario';
 
   useEffect(() => {
     const fetchUsuario = async () => {
       setLoading(true);
       try {
         if (cedula) {
-          // Si hay cédula en la URL, obtener los datos del backend
           const response = await axios.get(`http://localhost:5000/usuarios/${cedula}`);
           const usuarioData = response.data;
 
-          // Rellenar el formulario con los datos del usuario
           setValue('cedula', usuarioData.cedula);
           setValue('usuario_telegram', usuarioData.usuario_telegram);
           setValue('nombre', usuarioData.nombre);
           setValue('apellido', usuarioData.apellido);
           setValue('correo', usuarioData.correo);
           setValue('rol_id', usuarioData.rol_id);
-          setValue('rol_nombre', usuarioData.rol_nombre); // Nombre del rol
-          setValue('contrasena', ''); // Dejar la contraseña vacía por defecto
+          setValue('rol_nombre', usuarioData.rol_nombre);
         } else if (usuarioLocalStorage && usuarioLocalStorage.cedula) {
-          // Si no hay cédula en la URL, usar los datos del localStorage
+
           setValue('cedula', usuarioLocalStorage.cedula);
           setValue('usuario_telegram', usuarioLocalStorage.usuario_telegram);
           setValue('nombre', usuarioLocalStorage.nombre);
           setValue('apellido', usuarioLocalStorage.apellido);
           setValue('correo', usuarioLocalStorage.correo);
           setValue('rol_id', usuarioLocalStorage.rol_id);
-          setValue('rol_nombre', usuarioLocalStorage.rol_nombre); // Nombre del rol
-          setValue('contrasena', ''); // Dejar la contraseña vacía por defecto
+          setValue('rol_nombre', usuarioLocalStorage.rol_nombre); 
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -75,20 +80,40 @@ const UpdateUsuario: React.FC = () => {
       }
     };
 
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/listado_roles');
+        setRoles(response.data);
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+        toast.error('Error al cargar los roles', {
+          position: 'top-center',
+          autoClose: 3000,
+          theme: 'colored',
+        });
+      }
+    };
+
     fetchUsuario();
-  }, [cedula, setValue, usuarioLocalStorage]);
+    fetchRoles();
+  }, [cedula, setValue]);
 
   const onSubmit: SubmitHandler<Usuario> = async (data) => {
     setLoading(true);
     try {
-      const { cedula, created_at, rol_nombre, ...formValuesWithoutCreatedAt } = data;
+      const { cedula, created_at, rol_nombre, contrasena, ...formValuesWithoutCreatedAt } = data;
 
-      // Determinar la cédula a usar (de la URL o del localStorage)
       const cedulaActual = cedula || usuarioLocalStorage.cedula;
+
+      const datosActualizados = { ...formValuesWithoutCreatedAt };
+
+      if (contrasena) {
+        datosActualizados.contrasena = contrasena;
+      }
 
       const response = await axios.put(
         `http://localhost:5000/actualizar/${cedulaActual}`,
-        formValuesWithoutCreatedAt
+        datosActualizados
       );
 
       if (response.status === 200) {
@@ -97,7 +122,16 @@ const UpdateUsuario: React.FC = () => {
           autoClose: 3000,
           theme: 'colored',
         });
-        navigate('/usuarios');
+
+        if (usuarioLocalStorage.rol_nombre === 'superusuario') {
+          navigate('/dashboard/usuarios');
+        } else if (usuarioLocalStorage.rol_nombre === 'administrador') {
+          navigate('/dashboard/docente');
+        } else if (usuarioLocalStorage.rol_nombre === 'estudiante') {
+          navigate('/dashboard/matriculacion');
+        } else {
+          navigate('/login');
+        }
       } else {
         throw new Error(`Unexpected status code: ${response.status}`);
       }
@@ -177,14 +211,32 @@ const UpdateUsuario: React.FC = () => {
           </div>
 
           <div>
-            <Label htmlFor="rol_nombre">Rol:</Label>
-            <Input
-              id="rol_nombre"
-              type="text"
-              {...register('rol_nombre')}
-              disabled
-              className="bg-gray-100 dark:bg-gray-700"
-            />
+            <Label htmlFor="rol_id">Rol:</Label>
+            {isSuperusuario ? (
+              <Select
+                onValueChange={(value) => setValue('rol_id', Number(value))}
+                defaultValue={watch('rol_id')?.toString()}
+              >
+                <SelectTrigger className="bg-white dark:bg-slate-900">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-slate-900">
+                  {roles.map((rol) => (
+                    <SelectItem key={rol.rol_id} value={rol.rol_id.toString()}>
+                      {rol.rol_nombre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="rol_nombre"
+                type="text"
+                {...register('rol_nombre')}
+                disabled
+                className="bg-gray-100 dark:bg-gray-700"
+              />
+            )}
           </div>
 
           <div>

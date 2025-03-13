@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import api from "../api";
-import { CursoUsuarioPost, CursoUsuarioSchemaPost } from "@/models/cursoUsuario.model"; 
+import { CursoUsuarioPost, CursoUsuarioSchemaPost } from "@/models/cursoUsuario.model";
 
 /**
  * Crear un nuevo registro en CursoUsuario
@@ -33,7 +33,7 @@ export const createCursoUsuario = async (cursoUsuario: CursoUsuarioPost): Promis
  */
 export const getCursoUsuarios = async (): Promise<any> => {
   try {
-    const res: AxiosResponse = await api.get("/lista_pago");
+    const res: AxiosResponse = await api.get("/listado-pago");
 
     if (res.status === 200) {
       return res.data;
@@ -48,18 +48,11 @@ export const getCursoUsuarios = async (): Promise<any> => {
 /**
  * Actualizar un registro en CursoUsuario
  */
-export const updateCursoUsuario = async (cursoUsuario: CursoUsuarioPost): Promise<void> => {
+export const updateCursoUsuario = async (id: number, cedula: string, estado_pago: string): Promise<void> => {
   try {
-    // Validar los datos con Zod
-    const validatedData = CursoUsuarioSchemaPost.safeParse(cursoUsuario);
-
-    if (!validatedData.success) {
-      console.error("Error de validación:", validatedData.error);
-      return;
-    }
-
-    // Enviar la solicitud PUT al backend
-    const res: AxiosResponse = await api.put(`/actualizar_pago/${cursoUsuario.cedula}`, validatedData.data);
+    const res: AxiosResponse = await api.put(`/actualizar_estado_pago/${id}/${cedula}`, {
+      estado_pago: estado_pago,
+    });
 
     if (res.status === 200) {
       console.log("Registro actualizado:", res.data);
@@ -70,7 +63,6 @@ export const updateCursoUsuario = async (cursoUsuario: CursoUsuarioPost): Promis
     console.error("Error:", error);
   }
 };
-
 /**
  * Eliminar un registro en CursoUsuario
  */

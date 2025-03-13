@@ -1,4 +1,4 @@
-import {  BookOpen, UserPlus, Users, User } from "lucide-react";
+import {  BookOpen, UserPlus, Users, User, CheckCircle } from "lucide-react";
 
 export const dataGeneralSidebar = [
   {
@@ -25,4 +25,10 @@ export const dataGeneralSidebar = [
     href: "/dashboard/editar-perfil",
     roles: ["estudiante", "administrativo", "superusuario"], 
   },
+  {
+    icon: CheckCircle, 
+    label: "Verificar Pagos",
+    href: "/dashboard/Verificacion-Pagos",
+    roles: ["superusuario"], 
+}
 ];

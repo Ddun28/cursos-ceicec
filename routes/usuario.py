@@ -145,10 +145,13 @@ def actualizar_usuario(cedula):
         data = request.get_json()
         usuario_data = usuario_schema.load(data, partial=True)
 
-        # Cifrar la contraseña si se proporciona
+        # Cifrar la contraseña solo si se proporciona
         if 'contrasena' in usuario_data and usuario_data['contrasena']:
             contrasena_cifrada = bcrypt.hashpw(usuario_data['contrasena'].encode('utf-8'), bcrypt.gensalt())
             usuario_data['contrasena'] = contrasena_cifrada.decode('utf-8')
+        else:
+            # Si no se proporciona contraseña, eliminarla del diccionario para no actualizarla
+            usuario_data.pop('contrasena', None)
 
         # Actualizar los campos del usuario
         for key, value in usuario_data.items():

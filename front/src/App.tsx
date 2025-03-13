@@ -9,6 +9,7 @@ import Cursos from "./components/cursos/Cursos";
 import DashboardLayout from "./components/DashboardLayout/DashboardLayout";
 import { ThemeProvider } from "./components/DashboardLayout/components-test/theme-provider";
 import ListaCourses from "./components/matriculacion";
+import VerificacionPagos from "./components/verificacion-pagos/VerificacionPagos";
 
 function App() {
     return (
@@ -31,6 +32,7 @@ function App() {
                             <Route path="actualizar/:cedula" element={<DashboardLayout><UpdateUsuario /></DashboardLayout>} />
                             <Route path="docente" element={<DashboardLayout><Cursos /></DashboardLayout>} />
                             <Route path="usuarios" element={<DashboardLayout><ListaUsuarios /></DashboardLayout>} />
+                            <Route path="Verificacion-Pagos" element={<DashboardLayout><VerificacionPagos /></DashboardLayout>} />
                         </Route>
                     </Routes>
                 </div>

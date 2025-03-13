@@ -129,7 +129,6 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
                   <TableHead>Usuario de Telegram</TableHead>
                   <TableHead>Fecha de Inscripción</TableHead>
                   <TableHead>Estado de Pago</TableHead>
-                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -148,100 +147,11 @@ export const UsuariosInscritosModal = ({ cursoId, isOpen, onClose }: UsuariosIns
                         ? "Confirmado"
                         : "Cancelado"}
                     </TableCell>
-                    <TableCell>
-                      {usuario.estado_pago === "EN_ESPERA" && (
-                        <Button
-                          variant="default"
-                          onClick={() => handleOpenPagoDialog(usuario)}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          Verificar Pago
-                        </Button>
-                      )}
-                      {usuario.estado_pago === "CONFIRMADO" && (
-                        <Button variant="default" disabled className="bg-gray-400 text-white">
-                          Confirmado
-                        </Button>
-                      )}
-                      {usuario.estado_pago === "CANCELADO" && (
-                        <Button variant="default" disabled className="bg-red-400 text-white">
-                          Cancelado
-                        </Button>
-                      )}
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isPagoDialogOpen} onOpenChange={handleClosePagoDialog}>
-        <DialogContent className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-              Verificar Pago
-            </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600 dark:text-gray-300">
-              Detalles del pago para{" "}
-              <span className="font-semibold">
-                {selectedUsuario?.usuario.nombre} {selectedUsuario?.usuario.apellido}
-              </span>
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedUsuario && (
-            <div className="space-y-4 mt-4">
-              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong className="block text-gray-900 dark:text-white">Moneda:</strong>
-                  <span className="text-gray-600 dark:text-gray-400">{selectedUsuario.moneda}</span>
-                </p>
-              </div>
-
-              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong className="block text-gray-900 dark:text-white">Monto:</strong>
-                  <span className="text-gray-600 dark:text-gray-400">{selectedUsuario.monto}</span>
-                </p>
-              </div>
-
-              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong className="block text-gray-900 dark:text-white">Fecha del Pago:</strong>
-                  <span className="text-gray-600 dark:text-gray-400">{format(new Date(selectedUsuario.usuario.created_at), 'dd/MM/yyyy HH:mm:ss')}</span>
-                </p>
-              </div>
-
-
-              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong className="block text-gray-900 dark:text-white">Número de Referencia:</strong>
-                  <span className="text-gray-600 dark:text-gray-400">
-                    {selectedUsuario.numero_referencia}
-                  </span>
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-6 flex justify-end gap-2">
-            <Button
-              variant="default"
-              onClick={() => handleVerificarPago("CANCELADO")}
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
-            >
-              Rechazar Pago
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => handleVerificarPago("CONFIRMADO")}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
-            >
-              Confirmar Pago
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
     </>

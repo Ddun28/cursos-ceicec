@@ -56,10 +56,13 @@ const ModalInscripcion: React.FC<ModalProps> = ({
       return;
     }
   
+    // Extraer solo los curso_id del carrito
+    const cursosInscritosIds = carrito.map(curso => curso.curso_id);
+  
     // Datos para enviar al backend
     const cursoUsuarioData: CursoUsuarioPost = {
       cedula: cedula,
-      cursos_inscritos: carrito.map(curso => curso.curso_id),
+      cursos_inscritos: cursosInscritosIds, // Enviar solo los curso_id
       monto: total,
       moneda: tipoMoneda,
       estado_pago: 'EN_ESPERA',

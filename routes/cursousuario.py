@@ -28,41 +28,37 @@ def pago_curso():
 
         # Obtener los cursos a los que el usuario se inscribirá
         cursos_inscritos = pago_data['cursos_inscritos']
-        
+
+        # Verificar que todos los cursos existan
         for curso_id in cursos_inscritos:
-            # Obtener el curso correspondiente
             curso_actual = curso.query.get(curso_id)
             if not curso_actual:
                 return jsonify({'error': f'El curso con ID {curso_id} no existe'}), 404
 
-            # Crear un nuevo registro en la base de datos para cada curso
-            pago = cursousuario(
-                cedula=cedula,
-                cursos_inscritos=[curso_id],  # Cambiar a una lista que contenga el curso_id
-                monto=pago_data['monto'],
-                moneda=pago_data['moneda'],
-                estado_pago=pago_data['estado_pago'],
-                numero_referencia=pago_data.get('numero_referencia')  # Campo opcional
-            )
+        # Crear un solo registro en la base de datos con todos los cursos inscritos
+        pago = cursousuario(
+            cedula=cedula,
+            cursos_inscritos=cursos_inscritos,  # Guardar todos los curso_id en un solo registro
+            monto=pago_data['monto'],
+            moneda=pago_data['moneda'],
+            estado_pago=pago_data['estado_pago'],
+            numero_referencia=pago_data.get('numero_referencia')  # Campo opcional
+        )
 
-            # Guardar el registro en la base de datos
-            db.session.add(pago)
-
-        # Confirmar todas las inscripciones en la base de datos
+        # Guardar el registro en la base de datos
+        db.session.add(pago)
         db.session.commit()
 
         # Serializar y devolver la respuesta
-        result = CursoUsuarioSchema().dump(pago)  # Esto puede necesitar ajustes si hay múltiples inscripciones
+        result = CursoUsuarioSchema().dump(pago)
         return jsonify(result), 201
 
     except ValidationError as e:
-        # Manejar errores de validación
         db.session.rollback()
         print("Error de validación:", e.messages)
         return jsonify({'error': 'Datos inválidos', 'details': e.messages}), 400
 
     except Exception as e:
-        # Manejar otros errores
         db.session.rollback()
         print("Error en el backend:", str(e))
         return jsonify({'error': str(e)}), 500
@@ -129,7 +125,7 @@ def lista_pago_usuario(cedula):
 @routa.route('/actualizar_estado_pago/<int:id>/<string:cedula>', methods=['PUT'])
 def actualizar_estado_pago(id, cedula):
     try:
-        # Obtener el registro del usuario inscrito por su ID y cédula
+
         usuario_inscrito = cursousuario.query.filter_by(id=id, cedula=cedula).first()
         if not usuario_inscrito:
             return jsonify({"error": "Inscripción no encontrada"}), 404
