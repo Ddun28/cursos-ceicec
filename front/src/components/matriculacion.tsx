@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaShoppingCart } from 'react-icons/fa';
-import { jsPDF } from 'jspdf'; // Importamos jsPDF
+import { jsPDF } from 'jspdf'; 
 import { createCursoUsuario } from '@/api/curso-usuario/curso-usuario.api';
 import ModalInscripcion from './modalinscripcion';
 
@@ -71,79 +71,87 @@ export const ListaCourses: React.FC = () => {
     localStorage.setItem('carrito', JSON.stringify(carrito));
   }, [carrito]);
 
-  // Función para generar el reporte en PDF
+  const handlePagoExitoso = async () => {
+    setCarrito([]); 
+    localStorage.removeItem('carrito'); 
+  
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        const response = await axios.get('http://localhost:5000/listado-pago', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCursosInscritos(response.data);
+      }
+    } catch (error: any) {
+      setError(error.response?.data?.error || '');
+    }
+  };
+
   const generarReportePDF = (curso: Courses, estadoPago: string) => {
     const doc = new jsPDF();
 
-    // Configuración inicial
     doc.setFontSize(20);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(40, 40, 40);
     doc.text("Reporte de Pago del Curso", 20, 20);
 
-    // Línea divisoria
     doc.setDrawColor(200, 200, 200);
     doc.setLineWidth(0.5);
     doc.line(20, 25, 190, 25);
 
-    // Detalles del Curso
     doc.setFontSize(14);
     doc.setFont("helvetica", "normal");
     let yOffset = 35;
 
-    // Función para asegurar que el valor sea un string válido
     const asegurarString = (valor: any): string => {
       return valor !== undefined && valor !== null ? String(valor) : "N/A";
     };
 
-    // Obtener el nombre completo del instructor
     const nombreInstructor = curso.instructor
       ? `${curso.instructor.nombre} ${curso.instructor.apellido}`
       : "N/A";
 
     doc.text(`Curso: ${asegurarString(curso.nombre)}`, 20, yOffset);
     yOffset += 10;
-    doc.text(`Instructor: ${nombreInstructor}`, 20, yOffset); // Mostrar nombre y apellido
+    doc.text(`Instructor: ${nombreInstructor}`, 20, yOffset); 
     yOffset += 10;
     doc.text(`Costo: ${asegurarString(curso.costo)} Bolívares`, 20, yOffset);
     yOffset += 10;
-    doc.text(`Duración: ${asegurarString(curso.duracion)}`, 20, yOffset); // Duración ya es un string
+    doc.text(`Duración: ${asegurarString(curso.duracion)}`, 20, yOffset); 
     yOffset += 10;
-    doc.text(`Descripción: ${asegurarString(curso.descripcion)}`, 20, yOffset); // Nueva línea para la descripción
+    doc.text(`Descripción: ${asegurarString(curso.descripcion)}`, 20, yOffset); 
     yOffset += 10;
     doc.text(`Estado del Curso: ${curso.estado ? "Activo" : "Inactivo"}`, 20, yOffset);
     yOffset += 10;
     doc.text(`Límite de Estudiantes: ${asegurarString(curso.limite_estudiante)}`, 20, yOffset);
     yOffset += 15;
 
-    // Estado del Pago
+
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(estadoPago === "CONFIRMADO" ? 0 : 255, estadoPago === "CONFIRMADO" ? 128 : 0, 0);
     doc.text(`Estado del Pago: ${estadoPago === "CONFIRMADO" ? "Pagado" : "En espera"}`, 20, yOffset);
     yOffset += 20;
 
-    // Tabla de Detalles del Pago
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(40, 40, 40);
     doc.text("Detalles del Pago", 20, yOffset);
     yOffset += 10;
 
-    // Crear una tabla
     const headers = ["Concepto", "Valor"];
     const data = [
       ["Curso", asegurarString(curso.nombre)],
-      ["Instructor", nombreInstructor], // Usar nombre completo del instructor
+      ["Instructor", nombreInstructor], 
       ["Costo", `${asegurarString(curso.costo)} Bolívares`],
-      ["Duración", asegurarString(curso.duracion)], // Duración ya es un string
-      ["Descripción", asegurarString(curso.descripcion)], // Nueva fila para la descripción
+      ["Duración", asegurarString(curso.duracion)],
+      ["Descripción", asegurarString(curso.descripcion)], 
       ["Estado del Curso", curso.estado ? "Activo" : "Inactivo"],
       ["Límite de Estudiantes", asegurarString(curso.limite_estudiante)],
       ["Estado del Pago", estadoPago === "CONFIRMADO" ? "Pagado" : "En espera"],
     ];
 
-    // Dibujar la tabla
     doc.setFont("helvetica", "normal");
     doc.setTextColor(0, 0, 0);
     doc.setLineWidth(0.2);
@@ -153,7 +161,6 @@ export const ListaCourses: React.FC = () => {
     let rowHeight = 10;
     let colWidth = 85;
 
-    // Dibujar encabezados de la tabla
     doc.setFillColor(230, 230, 230);
     doc.rect(20, startY, colWidth, rowHeight, "F");
     doc.rect(20 + colWidth, startY, colWidth, rowHeight, "F");
@@ -161,35 +168,30 @@ export const ListaCourses: React.FC = () => {
     doc.text(headers[1], 25 + colWidth, startY + 7);
     startY += rowHeight;
 
-    // Dibujar filas de la tabla
     data.forEach((row) => {
       doc.rect(20, startY, colWidth, rowHeight, "S");
       doc.rect(20 + colWidth, startY, colWidth, rowHeight, "S");
-      doc.text(row[0], 25, startY + 7); // Concepto
-      doc.text(row[1], 25 + colWidth, startY + 7); // Valor
+      doc.text(row[0], 25, startY + 7);
+      doc.text(row[1], 25 + colWidth, startY + 7); 
       startY += rowHeight;
     });
 
-    // Pie de página
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
     doc.text("Gracias por su compra.", 20, startY + 20);
     doc.text("Fecha de generación: " + new Date().toLocaleDateString(), 20, startY + 30);
 
-    // Guardar el PDF
     doc.save(`reporte_pago_curso_${curso.curso_id}.pdf`);
   };
 
-  // Función para contar las inscripciones confirmadas de un curso
   const contarInscripcionesConfirmadasPorCurso = (cursoId: number) => {
     return cursosInscritos.filter(
       (inscripcion) =>
-        inscripcion.cursos_inscritos.includes(cursoId) && // Verificamos si el curso está en la inscripción
-        inscripcion.estado_pago.toUpperCase() === 'CONFIRMADO' // Solo contamos las confirmadas
+        inscripcion.cursos_inscritos.includes(cursoId) && 
+        inscripcion.estado_pago.toUpperCase() === 'CONFIRMADO' 
     ).length;
   };
 
-  // Función para verificar si el curso está en estado "EN_ESPERA"
   const cursoEnEspera = (cursoId: number) => {
     return cursosInscritos.some(
       (inscripcion) =>
@@ -200,13 +202,11 @@ export const ListaCourses: React.FC = () => {
   };
 
   const agregarAlCarrito = (curso: Courses) => {
-    // Verificar si el curso está en estado "EN_ESPERA"
     if (cursoEnEspera(curso.curso_id)) {
       alert('Este curso está en espera de confirmación de pago.');
       return;
     }
 
-    // Verificar si el usuario ya está inscrito en el curso
     const cursoInscrito = cursosInscritos.find(
       (inscripcion) =>
         inscripcion.cedula === cedulaUsuario &&
@@ -219,16 +219,13 @@ export const ListaCourses: React.FC = () => {
       return;
     }
 
-    // Contar las inscripciones confirmadas para este curso
     const inscripcionesConfirmadasPorCurso = contarInscripcionesConfirmadasPorCurso(curso.curso_id);
 
-    // Verificar si el curso ha alcanzado su límite de estudiantes
     if (inscripcionesConfirmadasPorCurso >= curso.limite_estudiante) {
       alert('Este curso ha alcanzado el límite de estudiantes.');
       return;
     }
 
-    // Si el curso no está lleno, lo agregamos al carrito
     setCarrito((prevCarrito) => {
       const cursoExistente = prevCarrito.find((c) => c.curso_id === curso.curso_id);
       if (!cursoExistente) {
@@ -297,7 +294,7 @@ export const ListaCourses: React.FC = () => {
             </button>
             {cursoInscrito && (
               <button
-                onClick={() => generarReportePDF(course, 'CONFIRMADO')} // Pasar el estado de pago
+                onClick={() => generarReportePDF(course, 'CONFIRMADO')} 
                 className="mt-3 ml-2 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500 transition"
               >
                 Descargar PDF
@@ -346,6 +343,7 @@ export const ListaCourses: React.FC = () => {
           onCerrar={handleCerrarModal}
           error={error}
           createCursoUsuario={createCursoUsuario}
+          onPagoExitoso={handlePagoExitoso} 
         />
       )}
     </div>

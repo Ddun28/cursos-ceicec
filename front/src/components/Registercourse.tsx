@@ -22,7 +22,7 @@ function Registercourse() {
         }
 
         try {
-            const res = await fetch("http://localhost:5000/curso", { // Cambiado a /curso
+            const res = await fetch("http://localhost:5000/curso", { 
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -39,13 +39,12 @@ function Registercourse() {
             });
 
             if (!res.ok) {
-                const data = await res.json(); // Obtener el mensaje de error del backend
-                setError(data.error || `Error ${res.status} al registrar el curso`); // Mostrar mensaje específico o genérico
+                const data = await res.json(); 
+                setError(data.error || `Error ${res.status} al registrar el curso`); 
                 return;
             }
 
             setSuccessMessage("Curso registrado exitosamente!");
-            // Reiniciar los campos del formulario (opcional)
             setCedula_instructor("");
             setCosto("");
             setDuracion("");
@@ -55,8 +54,8 @@ function Registercourse() {
             setNombre("");
 
         } catch (error) {
-            setError("Error al registrar el curso: " + error); // Mensaje de error más general
-            console.error("Error en la solicitud:", error); // Para depuración en la consola
+            setError("Error al registrar el curso: " + error); 
+            console.error("Error en la solicitud:", error); 
         }
     };
 
@@ -69,11 +68,11 @@ function Registercourse() {
                     <input type="text" onChange={(e) => setCedula_instructor(e.target.value)} value={cedula_instructor} placeholder='Cedula Instructor' /><br /><br />
                     <label>Costo:</label>
                     <input type="text" onChange={(e) => setCosto(e.target.value)} value={costo} placeholder='Costo' /><br /><br />
-                    <label>Duración:</label> {/* Corregido ortografía */}
+                    <label>Duración:</label>
                     <input type="text" onChange={(e) => setDuracion(e.target.value)} value={duracion} placeholder='Duracion' /><br /><br />
                     <label>Estado:</label>
                     <input type="text" onChange={(e) => setEstado(e.target.value)} value={estado} placeholder='Estado' /><br /><br />
-                    <label>Límite Estudiantes:</label> {/* Corregido ortografía */}
+                    <label>Límite Estudiantes:</label> 
                     <input type="text" onChange={(e) => setLimite_estudiante(e.target.value)} value={limite_estudiante} placeholder='Limite estudiantes' /><br /><br />
                     <label>Modalidad:</label>
                     <input type="text" onChange={(e) => setModalidad_id(e.target.value)} value={modalidad_id} placeholder='Modalidad' /><br /><br />

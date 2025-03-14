@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "react-toastify"; // Importar react-toastify
-import "react-toastify/dist/ReactToastify.css"; // Importar los estilos de react-toastify
-import { Eye, EyeOff } from "lucide-react"; // Importar íconos de lucide-react
+import { toast } from "react-toastify"; 
+import "react-toastify/dist/ReactToastify.css";
+import { Eye, EyeOff } from "lucide-react"; 
 
 function Login() {
   const [cedula, setCedula] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,7 +25,6 @@ function Login() {
     }
 
     try {
-      // Paso 1: Iniciar sesión
       const res = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: {
@@ -46,7 +45,6 @@ function Login() {
       // Guardar el token en localStorage
       localStorage.setItem("access_token", data.access_token);
 
-      // Paso 2: Obtener el nombre del rol usando el rol_id
       const rolRes = await fetch(`http://localhost:5000/rol/${data.usuario.rol_id}`);
       const rolData = await rolRes.json();
 
@@ -55,31 +53,28 @@ function Login() {
         return;
       }
 
-      // Agregar el rol_nombre al objeto usuario
       const usuarioActualizado = {
-        ...data.usuario, // Copiar todas las propiedades del usuario
-        rol_nombre: rolData.rol_nombre, // Agregar el rol_nombre
+        ...data.usuario, 
+        rol_nombre: rolData.rol_nombre, 
       };
 
-      // Guardar el usuario actualizado en localStorage
       localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
 
       // Mostrar toast de éxito
       toast.success("Inicio de sesión exitoso", {
         position: "top-center",
-        autoClose: 1000, // Duración de 1 segundo
+        autoClose: 1000, 
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        theme: "colored", // Usar el tema coloreado
+        theme: "colored", 
         style: {
-          backgroundColor: 'green', // Fondo negro
-          color: 'white', // Texto blanco
+          backgroundColor: 'green', 
+          color: 'white', 
         },
       });
 
-      // Retrasar la navegación por 1 segundo
       setTimeout(() => {
         switch (rolData.rol_nombre.toLowerCase()) {
           case "estudiante":

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UsuariosInscritosModal } from "./UsuariosInscritosModal";
-import { SquarePen, Trash2, Eye } from "lucide-react"; // Importar el ícono Eye
+import { SquarePen, Trash2, Eye } from "lucide-react"; 
 
 interface CursoActionsProps {
   onEdit: () => void;
@@ -39,18 +39,16 @@ export const CursoActions = ({ onEdit, onDelete, cursoId }: CursoActionsProps) =
           <Trash2 className="h-4 w-4" />
         </Button>
 
-        {/* Botón para ver usuarios inscritos */}
         <Button
           variant="ghost"
           className="dark:bg-blue-900 bg-blue-600 text-white hover:bg-blue-900/90 rounded flex items-center gap-2" // Añadir flex y gap
           onClick={() => setIsUsuariosModalOpen(true)}
         >
-          <Eye className="h-4 w-4" /> {/* Ícono de ojo */}
-          <span>Ver Inscritos</span> {/* Texto del botón */}
+          <Eye className="h-4 w-4" /> 
+          <span>Ver Inscritos</span> 
         </Button>
       </div>
 
-      {/* Modal de confirmación de eliminación */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
           <div className="dark:bg-gray-900 bg-white p-6 rounded-lg max-w-sm w-full">
@@ -82,7 +80,6 @@ export const CursoActions = ({ onEdit, onDelete, cursoId }: CursoActionsProps) =
         </div>
       )}
 
-      {/* Modal de usuarios inscritos */}
       <UsuariosInscritosModal
         cursoId={cursoId}
         isOpen={isUsuariosModalOpen}

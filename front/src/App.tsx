@@ -17,14 +17,9 @@ function App() {
             <Router>
                 <div>
                     <Routes>
-                        {/* Rutas públicas (sin DashboardLayout) */}
                         <Route path="/" element={<Login />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/registercourse" element={<Registercourse />} />
-                        <Route path="/usuarios" element={<ListaUsuarios />} />
-                        <Route path="/actualizar/:cedula" element={<UpdateUsuario />} />
-
                         <Route path="/dashboard">
 
                             <Route path="estudiante" element={<DashboardLayout><ListaCourses /></DashboardLayout>} />

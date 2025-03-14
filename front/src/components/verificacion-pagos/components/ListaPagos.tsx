@@ -43,10 +43,11 @@ export default function ListaPagos() {
   const handleVerificarPago = async (id: number, cedula: string, estado_pago: string) => {
     try {
       await updateCursoUsuario(id, cedula, estado_pago);
-  
+
+      // Actualizar solo el pago con el id específico
       setPagos((prevPagos) =>
         prevPagos.map((pago) =>
-          pago.cedula === cedula ? { ...pago, estado_pago } : pago
+          pago.id === id ? { ...pago, estado_pago } : pago
         )
       );
       setIsPagoDialogOpen(false);
@@ -172,18 +173,18 @@ export default function ListaPagos() {
 
           <div className="mt-6 flex justify-end gap-2">
             <Button
-            variant="default"
-            onClick={() => handleVerificarPago(selectedPago.id, selectedPago.cedula, "CANCELADO")}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+              variant="default"
+              onClick={() => handleVerificarPago(selectedPago.id, selectedPago.cedula, "CANCELADO")}
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
             >
-            Rechazar Pago
+              Rechazar Pago
             </Button>
             <Button
-            variant="default"
-            onClick={() => handleVerificarPago(selectedPago.id, selectedPago.cedula, "CONFIRMADO")}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+              variant="default"
+              onClick={() => handleVerificarPago(selectedPago.id, selectedPago.cedula, "CONFIRMADO")}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
             >
-            Confirmar Pago
+              Confirmar Pago
             </Button>
           </div>
         </DialogContent>

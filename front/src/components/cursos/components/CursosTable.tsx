@@ -21,10 +21,9 @@ export const CursosTable = () => {
   const [currentCourse, setCurrentCourse] = useState<CursoPost | null>(null);
   const [instructors, setInstructors] = useState<Usuario[]>([]);
   const [modalities, setModalities] = useState<Modalidad[]>([]);  
-  const [filteredInstructors, setFilteredInstructors] = useState<Usuario[]>([]); // Estado para los instructores filtrados
-  const [selectedRole, setSelectedRole] = useState<string>('administrativo'); // Estado para el rol seleccionado, predeterminado a "docente"
+  const [filteredInstructors, setFilteredInstructors] = useState<Usuario[]>([]); 
+  const [selectedRole, setSelectedRole] = useState<string>('administrativo'); 
 
-  // Obtener el usuario autenticado desde el localStorage
   const usuario = JSON.parse(localStorage.getItem('usuario') || {});
   const cedulaUsuario = usuario.cedula;
   const rolUsuario = usuario.rol_nombre;
@@ -32,9 +31,8 @@ export const CursosTable = () => {
   useEffect(() => {
     fetchCourses();
     fetchInstructorsAndModalities();
-    fetchInstructorsByRole(selectedRole); // Llama a la función para obtener instructores por rol al cargar el componente
-  }, []); // Solo se ejecuta una vez al montar el componente
-
+    fetchInstructorsByRole(selectedRole); 
+  }, []); 
   const fetchInstructorsAndModalities = async () => {
     try {
       const [instructorsData, modalitiesData] = await Promise.all([

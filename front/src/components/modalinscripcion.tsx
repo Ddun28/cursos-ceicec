@@ -12,14 +12,16 @@ interface ModalProps {
   carrito: Courses[];
   onCerrar: () => void;
   error: string;
-  createCursoUsuario: (data: CursoUsuarioPost) => Promise<void>; // Recibir la función como prop
+  createCursoUsuario: (data: CursoUsuarioPost) => Promise<void>;
+  onPagoExitoso: () => void;
 }
 
 const ModalInscripcion: React.FC<ModalProps> = ({ 
   carrito, 
   onCerrar, 
   error,
-  createCursoUsuario 
+  createCursoUsuario,
+  onPagoExitoso, 
 }) => {
   const [metodoPago, setMetodoPago] = useState('');
   const [tipoMoneda, setTipoMoneda] = useState('Bs');
@@ -28,16 +30,16 @@ const ModalInscripcion: React.FC<ModalProps> = ({
     vencimiento: '',
     cvv: ''
   });
-  const [cedula, setCedula] = useState<number | null>(null); // Estado para la cédula
+  const [cedula, setCedula] = useState<number | null>(null); 
 
   const total = carrito.reduce((sum, curso) => sum + curso.costo, 0);
 
-  // Obtener la cédula del localStorage al cargar el componente
+
   useEffect(() => {
-    const usuarioStorage = localStorage.getItem('usuario'); // Obtener el objeto usuario
+    const usuarioStorage = localStorage.getItem('usuario'); 
     if (usuarioStorage) {
-      const usuario = JSON.parse(usuarioStorage); // Convertir de string a objeto
-      setCedula(usuario.cedula); // Extraer la cédula y guardarla en el estado
+      const usuario = JSON.parse(usuarioStorage); 
+      setCedula(usuario.cedula); 
     } else {
       toast.error('Por favor, inicie sesión nuevamente.');
     }
@@ -56,13 +58,11 @@ const ModalInscripcion: React.FC<ModalProps> = ({
       return;
     }
   
-    // Extraer solo los curso_id del carrito
     const cursosInscritosIds = carrito.map(curso => curso.curso_id);
   
-    // Datos para enviar al backend
     const cursoUsuarioData: CursoUsuarioPost = {
       cedula: cedula,
-      cursos_inscritos: cursosInscritosIds, // Enviar solo los curso_id
+      cursos_inscritos: cursosInscritosIds, 
       monto: total,
       moneda: tipoMoneda,
       estado_pago: 'EN_ESPERA',
@@ -70,18 +70,15 @@ const ModalInscripcion: React.FC<ModalProps> = ({
     };
   
     try {
-      // Enviar los datos al backend usando la función pasada como prop
+
       await createCursoUsuario(cursoUsuarioData);
   
-      // Eliminar el carrito del localStorage
       localStorage.removeItem('carrito');
   
-      // Mostrar mensaje de éxito
       toast.success("Se registró el pago correctamente");
   
-      window.location.reload();
-
-      // Cerrar el modal después de un pago exitoso
+      onPagoExitoso();
+  
       onCerrar();
     } catch (error) {
       console.error("Error al crear el registro:", error);

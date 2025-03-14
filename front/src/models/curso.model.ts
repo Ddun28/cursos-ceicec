@@ -4,7 +4,7 @@ import { UsuarioSchema } from "./usuario.model";
 
 // Esquema para el curso (incluye relaciones con Usuario y Modalidad)
 export const CursoSchema = z.object({
-  curso_id: z.number().optional(), // Opcional porque no se envía al crear un nuevo curso
+  curso_id: z.number().optional(), 
   nombre: z.string().min(1, "El nombre es requerido"),
   cedula_instructor: z.number().min(1, "La cédula del instructor es requerida"),
   costo: z.number().min(0, "El costo no puede ser negativo"),

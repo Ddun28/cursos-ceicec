@@ -102,33 +102,43 @@ const UpdateUsuario: React.FC = () => {
     setLoading(true);
     try {
       const { cedula, created_at, rol_nombre, contrasena, ...formValuesWithoutCreatedAt } = data;
-
+  
       const cedulaActual = cedula || usuarioLocalStorage.cedula;
-
+  
       const datosActualizados = { ...formValuesWithoutCreatedAt };
-
+  
       if (contrasena) {
         datosActualizados.contrasena = contrasena;
       }
-
+  
       const response = await axios.put(
         `http://localhost:5000/actualizar/${cedulaActual}`,
         datosActualizados
       );
-
+  
       if (response.status === 200) {
         toast.success('Usuario actualizado correctamente', {
           position: 'top-center',
           autoClose: 3000,
           theme: 'colored',
         });
-
+  
+        // Actualizar el localStorage con los nuevos datos del usuario
+        const usuarioActualizado = {
+          ...usuarioLocalStorage,
+          ...datosActualizados,
+          contrasena: undefined, // Excluir la contraseña
+        };
+  
+        localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+  
+        // Redirigir según el rol
         if (usuarioLocalStorage.rol_nombre === 'superusuario') {
           navigate('/dashboard/usuarios');
         } else if (usuarioLocalStorage.rol_nombre === 'administrador') {
           navigate('/dashboard/docente');
         } else if (usuarioLocalStorage.rol_nombre === 'estudiante') {
-          navigate('/dashboard/matriculacion');
+          navigate('/dashboard/estudiante');
         } else {
           navigate('/login');
         }

@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-} from "@/components/ui/card"; // Asegúrate de importar el Card
+} from "@/components/ui/card"; 
 import {
   Table,
   TableBody,
@@ -69,7 +69,7 @@ export function DataTable<TData, TValue>({
                     data-state={row.getIsSelected() && "selected"}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="px-4 py-2"> {/* Ajusta el padding */}
+                      <TableCell key={cell.id} className="px-4 py-2"> 
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}

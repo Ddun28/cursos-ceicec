@@ -7,7 +7,6 @@ import { CursoUsuarioPost, CursoUsuarioSchemaPost } from "@/models/cursoUsuario.
  */
 export const createCursoUsuario = async (cursoUsuario: CursoUsuarioPost): Promise<void> => {
   try {
-    // Validar los datos con Zod
     const validatedData = CursoUsuarioSchemaPost.safeParse(cursoUsuario);
 
     if (!validatedData.success) {
@@ -15,7 +14,6 @@ export const createCursoUsuario = async (cursoUsuario: CursoUsuarioPost): Promis
       return;
     }
 
-    // Enviar la solicitud POST al backend
     const res: AxiosResponse = await api.post("/pago", validatedData.data);
 
     if (res.status === 201) {

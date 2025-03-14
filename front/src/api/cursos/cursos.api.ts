@@ -9,7 +9,6 @@ import { z } from "zod";
  */
 export const createCourse = async (curso: CursoPost): Promise<void> => {
   try {
-    // Validar los datos con Zod
     const validatedData = CursoSchemaPost.safeParse(curso);
 
     if (!validatedData.success) {
@@ -17,7 +16,6 @@ export const createCourse = async (curso: CursoPost): Promise<void> => {
       throw new Error("Datos inválidos");
     }
 
-    // Enviar la solicitud al backend
     const res: AxiosResponse<Curso> = await api.post("/curso", validatedData.data);
 
     if (res.status === 201) {
@@ -34,12 +32,9 @@ export const createCourse = async (curso: CursoPost): Promise<void> => {
 /**
  * Actualizar un curso existente
  */
-/**
- * Actualizar un curso existente
- */
+
 export const updateCourse = async (curso: Curso): Promise<void> => {
   try {
-    // Enviar la solicitud al backend sin validación
     const res: AxiosResponse<Curso> = await api.put(`/actualizar_cursos/${curso.curso_id}`, curso);
 
     if (res.status === 200) {
@@ -84,7 +79,6 @@ export const getCourses = async (): Promise<Curso[]> => {
     const res: AxiosResponse<Curso[]> = await api.get("/lista_cursos");
 
     if (res.status === 200) {
-      // Validar la respuesta con Zod
       const validatedData = z.array(CursoSchema).safeParse(res.data);
 
       if (!validatedData.success) {
