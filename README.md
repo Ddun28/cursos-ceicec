@@ -190,6 +190,14 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
 ----------
 
+##
+-        \l       //ver lista de Base de datos existentes
+-        CREATE DATABASE ceicec_db;             	//Ejemplo crear una base de datos
+-        CREATE USER cecciec WITH PASSWORD 'cecciec';    //ejemplo crear usuario y contraseña
+-        \c “nombre de la base de datos”   //conectarse a la base de datos, en nuestro caso “proyecto3”
+-        \dt                //enumera todas las tablas disponibles en la base de datos actual
+
+
 ## Estructura del Proyecto
 
 Copy
@@ -228,7 +236,9 @@ Si deseas contribuir a este proyecto, sigue estos pasos:
     
 5.  Abre un Pull Request.
     
+## Documentacion
 
+https://docs.google.com/document/d/1-daMFTLHqx5m-tWQP8anNn1RbHiHkLybJYm0zhrtxLY/edit?tab=t.0
 ----------
 
 ¡Gracias por usar el Proyecto Cursos CEICEC! Si tienes alguna pregunta, no dudes en abrir un issue en el repositorio.
