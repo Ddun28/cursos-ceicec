@@ -7,7 +7,7 @@ from enum import Enum as PyEnum
 from sqlalchemy.dialects.postgresql import JSONB
 import bcrypt
 
-engine = create_engine('postgresql://Lilian:lilian@localhost:5432/proyecto3')
+engine = create_engine('postgresql://dun:dun@localhost:5432/proyecto3')
 
 class Base(DeclarativeBase):
     pass
