@@ -116,32 +116,44 @@ class cursousuario(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     cedula = db.Column(db.Integer(), db.ForeignKey('usuarios.cedula'), nullable=False)
     cursos_inscritos = db.Column(db.JSON, nullable=False)
+    banco = db.Column(db.String(50), nullable=True) 
     monto = db.Column(db.Float(), nullable=False)
     moneda = db.Column(db.String(10), nullable=False)
-    estado_pago = db.Column(db.String(20), nullable=False, default='en_espera')
+    estado_pago = db.Column(db.String(20), nullable=False, default='EN_ESPERA')
     numero_referencia = db.Column(db.Integer(), nullable=True)
     fecha_inscripcion = db.Column(db.DateTime(), default=datetime.now)
+    fecha_pago = db.Column(db.DateTime(), nullable=True)  # Sin default
 
-    # Relación muchos a uno con Usuario
     usuario = db.relationship('usuario', backref='inscripciones')
 
-    def __init__(self, cedula, cursos_inscritos, monto, moneda, estado_pago, numero_referencia=None):
-        self.cedula = cedula
-        self.cursos_inscritos = cursos_inscritos
-        self.monto = monto
-        self.moneda = moneda
-        self.estado_pago = estado_pago
-        self.numero_referencia = numero_referencia
+    def __init__(self, **kwargs):
+        # Eliminar fecha_pago si viene del frontend
+        kwargs.pop('fecha_pago', None)
+        
+        # Asignar fecha_pago SOLO si el estado es EN_ESPERA
+        if kwargs.get('estado_pago') == 'EN_ESPERA':
+            kwargs['fecha_pago'] = datetime.now()
+        
+        super().__init__(**kwargs)
+
 
 class CursoUsuarioSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'cedula', 'banco', 'cursos_inscritos', 
+                'monto', 'moneda', 'estado_pago',
+                'numero_referencia', 'fecha_pago', 'fecha_inscripcion')
+    
     id = fields.Int(dump_only=True)
     cedula = fields.Int(required=True)
+    banco = fields.Str(required=False, allow_none=True)  # Hacer opcional si corresponde
     cursos_inscritos = fields.List(fields.Int(), required=True)
     monto = fields.Float(required=True)
     moneda = fields.Str(required=True)
-    estado_pago = fields.Str(required=True)
+    estado_pago = fields.Str(required=False, default="EN_ESPERA")    # Usar load_default en lugar de default
     numero_referencia = fields.Int(allow_none=True)
+    fecha_pago = fields.DateTime(dump_only=True)  # Solo lectura
     fecha_inscripcion = fields.DateTime(dump_only=True)
+
 
 cursousuario_schema = CursoUsuarioSchema()
 cursosusuarios_schema = CursoUsuarioSchema(many=True)

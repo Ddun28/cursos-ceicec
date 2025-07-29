@@ -65,17 +65,26 @@ class CursoUsuario(Base):
     __tablename__ = 'usuario_curso'
     id = Column(Integer(), primary_key=True, autoincrement=True)
     cedula = Column(Integer(), ForeignKey('usuarios.cedula'), nullable=False)
+    banco = Column(String(50), nullable=True)  
     cursos_inscritos = Column(JSONB, nullable=False)
     monto = Column(Float(), nullable=False)
     moneda = Column(String(10), nullable=False)
     estado_pago = Column(Enum(EstadoPago), nullable=False, default=EstadoPago.EN_ESPERA)
     numero_referencia = Column(Integer(), nullable=True)
+    fecha_pago = Column(DateTime(), nullable=True)  
     fecha_inscripcion = Column(DateTime(), default=datetime.now)
     created_at = Column(DateTime(), default=datetime.now)
     updated_at = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     usuario = relationship("Usuario", back_populates="inscripciones")
 
+    def __init__(self, **kwargs):
+        kwargs.pop('fecha_pago', None)
+        
+        if kwargs.get('estado_pago') == EstadoPago.EN_ESPERA:
+            kwargs['fecha_pago'] = datetime.now()
+        
+        super().__init__(**kwargs)
 Session = sessionmaker(engine)
 session = Session()
 

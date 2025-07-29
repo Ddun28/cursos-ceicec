@@ -79,10 +79,6 @@ export default function ListaPagos() {
     }
   };
 
-  if (error) {
-    return <div className="p-4 text-red-500">{error}</div>;
-  }
-
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Lista de Pagos</h1>
@@ -153,9 +149,23 @@ export default function ListaPagos() {
 
               <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <strong className="block text-gray-900 dark:text-white">Banco:</strong>
+                  <span className="text-gray-600 dark:text-gray-400">{selectedPago.banco}</span>
+                </p>
+              </div>
+
+              <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                <p className="text-sm text-gray-700 dark:text-gray-300">
                   <strong className="block text-gray-900 dark:text-white">Fecha del Pago:</strong>
                   <span className="text-gray-600 dark:text-gray-400">
-                    {new Date(selectedPago.fecha_inscripcion).toLocaleString()}
+                    {new Date(selectedPago.fecha_pago).toLocaleString('es-ES', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true
+                    })}
                   </span>
                 </p>
               </div>

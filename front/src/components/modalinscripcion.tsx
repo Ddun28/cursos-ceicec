@@ -25,6 +25,7 @@ const ModalInscripcion: React.FC<ModalProps> = ({
 }) => {
   const [metodoPago, setMetodoPago] = useState('');
   const [tipoMoneda, setTipoMoneda] = useState('Bs');
+  const [banco, setBanco] = useState('');
   const [datosTarjeta, setDatosTarjeta] = useState({
     numero: '',
     vencimiento: '',
@@ -33,7 +34,6 @@ const ModalInscripcion: React.FC<ModalProps> = ({
   const [cedula, setCedula] = useState<number | null>(null); 
 
   const total = carrito.reduce((sum, curso) => sum + curso.costo, 0);
-
 
   useEffect(() => {
     const usuarioStorage = localStorage.getItem('usuario'); 
@@ -67,18 +67,16 @@ const ModalInscripcion: React.FC<ModalProps> = ({
       moneda: tipoMoneda,
       estado_pago: 'EN_ESPERA',
       numero_referencia: metodoPago === 'movil' ? parseInt(datosTarjeta.numero) : undefined,
+      banco: metodoPago === 'transferencia' || metodoPago === 'movil' ? banco : undefined,
     };
   
     try {
-
+      console.log(cursoUsuarioData);
+      
       await createCursoUsuario(cursoUsuarioData);
-  
       localStorage.removeItem('carrito');
-  
       toast.success("Se registró el pago correctamente");
-  
       onPagoExitoso();
-  
       onCerrar();
     } catch (error) {
       console.error("Error al crear el registro:", error);
@@ -130,16 +128,61 @@ const ModalInscripcion: React.FC<ModalProps> = ({
             </select>
           </div>
 
+          {(metodoPago === 'transferencia' || metodoPago === 'movil') && (
+            <div className="mb-4">
+              <label className="block mb-2 font-medium">Banco</label>
+              <select
+                value={banco}
+                onChange={(e) => setBanco(e.target.value)}
+                className="w-full p-2 border dark:bg-black rounded-md"
+                required
+              >
+                <option value="">Seleccione su banco</option>
+                <option value="Banco de Venezuela">Banco de Venezuela</option>
+                <option value="Banesco">Banesco</option>
+                <option value="Mercantil">Mercantil</option>
+                <option value="Provincial">Provincial</option>
+                <option value="Bancaribe">Bancaribe</option>
+                <option value="Banco del Tesoro">Banco del Tesoro</option>
+              </select>
+            </div>
+          )}
+
           {metodoPago === 'movil' && (
             <div className="mb-4">
               <p className="text-sm dark:bg-black bg-gray-100 p-3 rounded-md">
                 Realice el pago móvil al siguiente número:
                 <br />
-                <strong>Banco de Venezuela (0102)</strong>
+                <strong>Banco: {banco || '[Seleccione banco]'}</strong>
                 <br />
                 <strong>Número de teléfono: 0424-7382322</strong>
                 <br />
                 <strong>Cédula: 1277301</strong>
+              </p>
+              <label className="block mb-2 font-medium">Número de Referencia</label>
+              <input
+                type="text"
+                placeholder="Ingrese el número de referencia"
+                className="w-full p-2 border dark:bg-black rounded-md"
+                required
+                value={datosTarjeta.numero}
+                onChange={(e) => setDatosTarjeta({ ...datosTarjeta, numero: e.target.value })}
+              />
+            </div>
+          )}
+
+          {metodoPago === 'transferencia' && (
+            <div className="mb-4">
+              <p className="text-sm dark:bg-black bg-gray-100 p-3 rounded-md">
+                Realice la transferencia a la siguiente cuenta:
+                <br />
+                <strong>Banco: {banco || '[Seleccione banco]'}</strong>
+                <br />
+                <strong>Cuenta Corriente: 0102-1234-5678-9101</strong>
+                <br />
+                <strong>Titular: Academia XYZ</strong>
+                <br />
+                <strong>RIF: J-123456789</strong>
               </p>
               <label className="block mb-2 font-medium">Número de Referencia</label>
               <input

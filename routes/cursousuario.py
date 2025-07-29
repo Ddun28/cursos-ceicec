@@ -19,49 +19,55 @@ def pago_curso():
         # Obtener la cédula del usuario autenticado
         cedula = get_jwt_identity()
 
-        # Obtener los datos enviados desde el frontend
+        # Obtener y limpiar los datos del frontend
         data = request.get_json()
         print("Data recibida:", data)
+        
+        # Eliminar fecha_pago si viene del frontend (seguridad adicional)
+        if 'fecha_pago' in data:
+            del data['fecha_pago']
 
         # Validar y deserializar los datos usando el esquema
         pago_data = CursoUsuarioSchema().load(data)
 
-        # Obtener los cursos a los que el usuario se inscribirá
-        cursos_inscritos = pago_data['cursos_inscritos']
-
         # Verificar que todos los cursos existan
-        for curso_id in cursos_inscritos:
-            curso_actual = curso.query.get(curso_id)
-            if not curso_actual:
+        for curso_id in pago_data['cursos_inscritos']:
+            if not curso.query.get(curso_id):
                 return jsonify({'error': f'El curso con ID {curso_id} no existe'}), 404
 
-        # Crear un solo registro en la base de datos con todos los cursos inscritos
+        # Crear el registro (la fecha se gestiona automáticamente en el modelo)
         pago = cursousuario(
             cedula=cedula,
-            cursos_inscritos=cursos_inscritos,  # Guardar todos los curso_id en un solo registro
+            banco=pago_data.get('banco'),  # Campo opcional
+            cursos_inscritos=pago_data['cursos_inscritos'],
             monto=pago_data['monto'],
             moneda=pago_data['moneda'],
-            estado_pago=pago_data['estado_pago'],
+            estado_pago=pago_data.get('estado_pago', 'EN_ESPERA'),
             numero_referencia=pago_data.get('numero_referencia')  # Campo opcional
         )
 
-        # Guardar el registro en la base de datos
         db.session.add(pago)
         db.session.commit()
 
         # Serializar y devolver la respuesta
-        result = CursoUsuarioSchema().dump(pago)
-        return jsonify(result), 201
+        return jsonify(CursoUsuarioSchema().dump(pago)), 201
 
     except ValidationError as e:
         db.session.rollback()
         print("Error de validación:", e.messages)
-        return jsonify({'error': 'Datos inválidos', 'details': e.messages}), 400
+        return jsonify({
+            'error': 'Datos inválidos',
+            'details': e.messages,
+            'custom_message': 'Verifica los datos del pago'
+        }), 400
 
     except Exception as e:
         db.session.rollback()
         print("Error en el backend:", str(e))
-        return jsonify({'error': str(e)}), 500
+        return jsonify({
+            'error': 'Error al procesar el pago',
+            'system_error': str(e)
+        }), 500
     
 @routa.route('/listado-pago', methods=['GET'])
 def listado_pago():
