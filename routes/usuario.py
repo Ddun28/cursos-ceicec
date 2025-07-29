@@ -1,4 +1,4 @@
-from ..modelo import usuario, usuario_schema, db, usuarios_schema, Rol  
+from ..modelo import usuario, usuario_schema, db, usuarios_schema, Rol, cursousuario, curso
 from flask import request, jsonify
 import bcrypt
 from flask import Blueprint
@@ -164,18 +164,45 @@ def actualizar_usuario(cedula):
         db.session.rollback()
         return jsonify({'error': str(e)}), 400
 
-@ruta.route('/eliminar/<cedula>', methods=['DELETE'])
+@ruta.route('/eliminar/<int:cedula>', methods=['DELETE'])
 def eliminar_usuario(cedula):
     try:
-        cedula= usuario.query.get_or_404(cedula) 
-    
-        db.session.delete(cedula)
+        # Obtener el usuario a eliminar
+        usuario_a_eliminar = usuario.query.get_or_404(cedula)
+        
+        # Verificar si el usuario tiene cursos inscritos como estudiante
+        inscripciones = cursousuario.query.filter_by(cedula=cedula).all()
+        
+        # Verificar si el usuario tiene cursos asignados como instructor
+        cursos_como_instructor = curso.query.filter_by(cedula_instructor=cedula).all()
+        
+        if inscripciones:
+            return jsonify({
+                'error': 'No se puede eliminar el usuario porque está inscrito en cursos como estudiante',
+                'cursos_inscritos': [i.id for i in inscripciones]
+            }), 400
+            
+        if cursos_como_instructor:
+            return jsonify({
+                'error': 'No se puede eliminar el usuario tiene cursos asignados como instructor',
+                'cursos_como_instructor': [c.curso_id for c in cursos_como_instructor]
+            }), 400
+
+        # Eliminar el usuario
+        db.session.delete(usuario_a_eliminar)
         db.session.commit()
-        return jsonify({'mensaje': 'Usuario eliminado correctamente'}), 200
+        
+        return jsonify({
+            'mensaje': 'Usuario eliminado correctamente'
+        }), 200
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 400
-    
+        return jsonify({
+            'error': 'Error al eliminar el usuario',
+            'detalles': str(e)
+        }), 500
+
 @ruta.route('/login', methods=['POST'])
 def login():
     try:

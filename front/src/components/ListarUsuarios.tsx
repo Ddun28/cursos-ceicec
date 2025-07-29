@@ -328,7 +328,7 @@ const ListaUsuarios: React.FC = () => {
 
       {/* Modal de confirmación para eliminar usuario */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className='bg-white dark:bg-gray-900 max-w-md w-full'>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro de eliminar este usuario?</AlertDialogTitle>
             <AlertDialogDescription>
