@@ -1,244 +1,103 @@
 # Proyecto Cursos CEICEC
 
-Este proyecto es una aplicación web desarrollado con  **Flask**  en el backend y  **Node.js**  en el frontend. Proporciona una plataforma para gestionar cursos y está diseñada para ser fácil de instalar y ejecutar.
+Aplicación web para gestión de cursos.
 
-----------
-
-## Tabla de Contenidos
-
-1.  Requisitos
-    
-2.  Instalación
-    
-    -   Backend (Flask)
-        
-    -   Base de Datos (PostgreSQL)
-        
-    -   Frontend (Node.js)
-        
-3.  Ejecución
-    
-4.  Estructura del Proyecto
-    
-5.  Contribución
-    
-6.  Licencia
-    
-
-----------
+- Backend: Flask + SQLAlchemy
+- Frontend: React + Vite
+- Base de datos: PostgreSQL
 
 ## Requisitos
 
-Antes de comenzar, asegúrate de tener instalado lo siguiente:
+- Python 3.8+
+- Node.js 20+
+- npm
+- PostgreSQL 12+
 
--   **Python 3+**
-    
--   **PostgreSQL**
-    
--   **Node.js 16+**
-    
--   **npm**  (viene con Node.js)
-    
--   **pip**  (gestor de paquetes de Python)
-    
+## Instalación Rápida
 
-----------
+### 1) Clonar y entrar al proyecto
 
-## Instalación
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd cursos-ceicec
+```
 
-### Backend (Flask)
+### 2) Backend (Python)
 
-1.  **Instalar Python y pip**:
-    
-    bash
-    
-    Copy
-    
-    sudo apt update
-    sudo apt install python3 python3-pip
-    
-2.  **Crear y activar un entorno virtual**:
-    
-    bash
-    
-    Copy
-    
-    python3 -m venv myenv
-    source myenv/bin/activate  # Linux/macOS
-    
-3.  **Instalar dependencias de Flask**:  
-    Navega a la carpeta del proyecto y ejecuta:
-    
-    bash
-    
-    Copy
-    
-    cd proyectogustavo
-    pip install -r requirements.txt
-    
-4.  **Configurar la base de datos**:
-    
-    -   Instala PostgreSQL:
-        
-        bash
-        
-        Copy
-        
-        sudo apt install postgresql postgresql-contrib
-        
-    -   Crea un usuario y una base de datos en PostgreSQL.
-        
-    -   Configura las credenciales de la base de datos en el archivo  `app.py`.
-        
+```bash
+python3 -m venv myenv
+source myenv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-----------
+### 3) Base de datos (PostgreSQL)
 
-### Base de Datos (PostgreSQL)
+En PostgreSQL, crea la base y usuario de ejemplo:
 
-1.  **Crear un usuario y una base de datos**:
-    
-    bash
-    
-    Copy
-    
-    sudo -u postgres psql
-    CREATE DATABASE ceicec_db;
-    CREATE USER ceicec_user WITH PASSWORD 'tu_contraseña';
-    GRANT ALL PRIVILEGES ON DATABASE ceicec_db TO ceicec_user;
-    \q
-    
-2.  **Configurar la conexión en  `app.py`**:  
-    Asegúrate de que el archivo  `app.py`  tenga la configuración correcta para conectarse a la base de datos:
-    
-    python
-    
-    Copy
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ceicec_user:tu_contraseña@localhost/ceicec_db'
-    
+```sql
+CREATE DATABASE proyecto3;
+CREATE USER dun WITH PASSWORD 'dun';
+GRANT ALL PRIVILEGES ON DATABASE proyecto3 TO dun;
+```
 
-----------
+La conexión actual en el backend está definida en `app.py` así:
 
-### Frontend (Node.js)
+```python
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://dun:dun@localhost:5432/proyecto3'
+```
 
-1.  **Instalar Node.js y npm**:
-    
-    bash
-    
-    Copy
-    
-    sudo apt install curl -y
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-    sudo apt install -y nodejs
-    
-2.  **Instalar dependencias del frontend**:  
-    Navega a la carpeta  `front`  y ejecuta:
-    
-    bash
-    
-    Copy
-    
-    cd front
-    npm install
-    
+Si usas otro usuario, contraseña o base de datos, ajusta esa línea.
 
-----------
+### 4) Frontend (Node)
 
-## Ejecución
+```bash
+cd front
+npm install
+cd ..
+```
+
+## Verificación de instalación
 
 ### Backend
 
-1.  **Activar el entorno virtual**:
-    
-    bash
-    
-    Copy
-    
-    source myenv/bin/activate
-    
-2.  **Ejecutar la aplicación Flask**:
-    
-    bash
-    
-    Copy
-    
-    flask run
-    
-    La aplicación estará disponible en  `http://127.0.0.1:5000`.
-    
+```bash
+source myenv/bin/activate
+python -c "import flask, flask_sqlalchemy, flask_jwt_extended, marshmallow, psycopg2, bcrypt; print('backend_ok')"
+```
 
 ### Frontend
 
-1.  **Navegar a la carpeta  `front`**:
-    
-    bash
-    
-    Copy
-    
-    cd front
-    
-2.  **Iniciar el servidor de desarrollo**:
-    
-    bash
-    
-    Copy
-    
-    npm run dev
-    
-    El frontend estará disponible en  `http://localhost:3000`.
-    
+```bash
+cd front
+npm run dev
+```
 
-----------
+## Notas importantes
 
-##
--        \l       //ver lista de Base de datos existentes
--        CREATE DATABASE ceicec_db;             	//Ejemplo crear una base de datos
--        CREATE USER cecciec WITH PASSWORD 'cecciec';    //ejemplo crear usuario y contraseña
--        \c “nombre de la base de datos”   //conectarse a la base de datos, en nuestro caso “proyecto3”
--        \dt                //enumera todas las tablas disponibles en la base de datos actual
+- `requirements.txt` fue limpiado para contener solo dependencias reales del backend.
+- Si ejecutas `npm run build`, pueden aparecer errores TypeScript existentes del proyecto. Eso no bloquea la instalación ni `npm run dev`.
 
+## Estructura general
 
-## Estructura del Proyecto
-
-Copy
-
-proyectogustavo/
-
-│   ├── __init__.py
-│   ├── query.sql
-│   ├── app.py
-│   ├── routes/
-│   ├── models.py
-│   ├── modelo.py
-│   └── requeriments.txt
-├── front/
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   └── ...
-├── requirements.txt
+```text
+cursos-ceicec/
 ├── app.py
-└── README.md
-
-----------
+├── modelo.py
+├── routes/
+├── requirements.txt
+└── front/
+    ├── package.json
+    └── src/
+```
 
 ## Contribución
 
-Si deseas contribuir a este proyecto, sigue estos pasos:
+1. Haz un fork del repositorio.
+2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`).
+3. Realiza tus cambios y haz commit.
+4. Haz push y abre un Pull Request.
 
-1.  Haz un fork del repositorio.
-    
-2.  Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`).
-    
-3.  Realiza tus cambios y haz commit (`git commit -m 'Añadir nueva funcionalidad'`).
-    
-4.  Haz push a la rama (`git push origin feature/nueva-funcionalidad`).
-    
-5.  Abre un Pull Request.
-    
-## Documentacion
+## Documentación adicional
 
 https://docs.google.com/document/d/1-daMFTLHqx5m-tWQP8anNn1RbHiHkLybJYm0zhrtxLY/edit?tab=t.0
-----------
-
-¡Gracias por usar el Proyecto Cursos CEICEC! Si tienes alguna pregunta, no dudes en abrir un issue en el repositorio.
